@@ -1,0 +1,22 @@
+﻿///<reference path="../../../../../../node_modules/abp-web-resources/Abp/Framework/scripts/abp.d.ts"/>
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SettingService {
+
+    get(name: string): string {
+        return axis.setting.get(name);
+    }
+
+    getBoolean(name: string): boolean {
+        return axis.setting.getBoolean(name);
+    }
+    
+    getInt(name: string): number {
+        return axis.setting.getInt(name);
+    }
+
+}
