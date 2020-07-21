@@ -1,5 +1,5 @@
 /*
- * Public API Surface of axis-ng2-module
+ * Public API Surface of ng-axis
  */
 
 export * from './lib/axis.module';

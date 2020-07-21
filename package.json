@@ -1,6 +1,6 @@
 {
-  "name": "@orendalabs/ng-axis",
-  "version": "1.0.0",
+  "name": "@cartesian-ui/ng-axis",
+  "version": "1.0.1",
   "description": "Serve as y-axis for cartesian-ui project.",
   "license": "MIT",
   "keywords": [
