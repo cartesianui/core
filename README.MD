@@ -9,7 +9,7 @@ Issues of this repository are tracked on https://github.com/orendalabs/ng-axs. P
 To install this library, run:
 
 ```bash
-$ npm install ng-axis --save
+$ npm i @cartesian-ui/ng-axis --save
 ```
 ## Development
 
