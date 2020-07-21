@@ -1,6 +1,31 @@
 {
-  "name": "axis-ng2-module",
-  "version": "6.0.0",
+  "name": "@orendalabs/ng-axis",
+  "version": "1.0.0",
+  "description": "Serve as y-axis for cartesian-ui project.",
+  "license": "MIT",
+  "keywords": [
+    "ng axis",
+    "npm",
+    "package",
+    "ng-axis",
+    "cartesian-ui",
+    "component"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Syed Ali Murtaza Kazmi <ali@kazmi.me>",
+  "contributors": [
+    {
+      "name" : "Aftab Khan",
+      "url" : "https://github.com/Aaftab-khan/"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/orendalabs/ng-axis/issues",
+    "email": "support@orendalabs.net"
+  },
+  "homepage": "https://github.com/orendalabs/ng-axis#readme",
   "peerDependencies": {
     "@angular/common": "^9.0.7",
     "@angular/core": "^9.0.7",

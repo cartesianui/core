@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/abp-web-resources/Abp/Framework/scripts/abp.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -8,15 +8,15 @@ import { Injectable } from '@angular/core';
 export class UtilsService {
 
     getCookieValue(key: string): string {
-        return abp.utils.getCookieValue(key);
+        return axis.utils.getCookieValue(key);
     }
 
     setCookieValue(key: string, value: string, expireDate?: Date, path?: string): void {
-        abp.utils.setCookieValue(key, value, expireDate, path);
+        axis.utils.setCookieValue(key, value, expireDate, path);
     }
 
     deleteCookie(key: string, path?: string): void {
-        abp.utils.deleteCookie(key, path);
+        axis.utils.deleteCookie(key, path);
     }
 
 }

@@ -1,10 +1,10 @@
-﻿///<reference path="../../../../../node_modules/abp-web-resources/Abp/Framework/scripts/abp.d.ts"/>
+﻿///<reference path="../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 declare var jQuery: any;
-declare var abp: any;
+declare var axis: any;
 
 @Injectable({
     providedIn: 'root'

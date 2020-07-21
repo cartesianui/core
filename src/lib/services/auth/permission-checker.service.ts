@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/abp-web-resources/Abp/Framework/scripts/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
 
 import { Injectable } from '@angular/core';
 

@@ -1,3 +1,3 @@
-export * from './abpHttpInterceptor';
-export * from './abp-http-configuration.service';
+export * from './axisHttpInterceptor';
+export * from './axis-http-configuration.service';
 export * from './refresh-token.service';
