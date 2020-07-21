@@ -1,26 +1,24 @@
 ﻿///<reference path="../../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
 
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: "root",
 })
 export class LocalizationService {
+  get languages(): axis.localization.ILanguageInfo[] {
+    return axis.localization.languages;
+  }
 
-    get languages(): axis.localization.ILanguageInfo[] {
-        return abp.localization.languages;
-    }
+  get currentLanguage(): axis.localization.ILanguageInfo {
+    return axis.localization.currentLanguage;
+  }
 
-    get currentLanguage(): axis.localization.ILanguageInfo {
-        return axis.localization.currentLanguage;
-    }
+  localize(key: string, sourceName: string): string {
+    return axis.localization.localize(key, sourceName);
+  }
 
-    localize(key: string, sourceName: string): string {
-        return axis.localization.localize(key, sourceName);
-    }
-    
-    getSource(sourceName: string): (...key: string[]) => string {
-        return axis.localization.getSource(sourceName);
-    }
-
+  getSource(sourceName: string): (...key: string[]) => string {
+    return axis.localization.getSource(sourceName);
+  }
 }

@@ -1,22 +1,20 @@
 ﻿///<reference path="../../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
 
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: "root",
 })
 export class SettingService {
+  get(name: string): string {
+    return axis.setting.get(name);
+  }
 
-    get(name: string): string {
-        return axis.setting.get(name);
-    }
+  getBoolean(name: string): boolean {
+    return axis.setting.getBoolean(name);
+  }
 
-    getBoolean(name: string): boolean {
-        return axis.setting.getBoolean(name);
-    }
-    
-    getInt(name: string): number {
-        return axis.setting.getInt(name);
-    }
-
+  getInt(name: string): number {
+    return axis.setting.getInt(name);
+  }
 }

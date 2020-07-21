@@ -1,35 +1,29 @@
 export interface IValidationErrorInfo {
+  message: string;
 
-    message: string;
-
-    members: string[];
-
+  members: string[];
 }
 
 export interface IErrorInfo {
+  code: number;
 
-    code: number;
+  message: string;
 
-    message: string;
+  details: string;
 
-    details: string;
-
-    validationErrors: IValidationErrorInfo[];
-
+  validationErrors: IValidationErrorInfo[];
 }
 
 export interface IAjaxResponse {
+  success: boolean;
 
-    success: boolean;
+  result?: any;
 
-    result?: any;
+  targetUrl?: string;
 
-    targetUrl?: string;
+  error?: IErrorInfo;
 
-    error?: IErrorInfo;
+  unAuthorizedRequest: boolean;
 
-    unAuthorizedRequest: boolean;
-
-    __axis: boolean;
-
+  __axis: boolean;
 }
