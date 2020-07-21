@@ -21,11 +21,10 @@ $ ng build ng-axis --prod
 
 ## AxisHttpInterceptor
 
-In order to use AxisHttpInterceptor in your module, first import it and AxisHttpInterceptor into your module like below;
+In order to use AxisHttpInterceptor, first import it into module like below;
 
 ```ts
-import { AxisModule } from '@axis/axis.module';
-import { AxisHttpInterceptor } from '@axis/axisHttpInterceptor';
+import { AxisHttpInterceptor } from '@cartesian-ui/ng-axis';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 ```
 
@@ -37,8 +36,16 @@ imports: [
 ],
 providers: [
     ///other providers
-    { provide: HTTP_INTERCEPTORS, useClass: AbpHttpInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AxisHttpInterceptor, multi: true }
 ]
+```
+
+## AxisMultiTenancyService
+
+Import any other service e.g. AxisMultiTenancyService
+
+```ts
+import { AxisMultiTenancyService } from '@cartesian-ui/ng-axis';
 ```
 
 ## License
