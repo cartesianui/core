@@ -1,6 +1,6 @@
 # Important
 
-Issues of this repository are tracked on https://github.com/orendalabs/ng-axs. Please create your issues on https://github.com/orendalabs/ng-axis/issues.
+Issues of this repository are tracked on https://github.com/orendalabs/cartesian-ng-axs. Please create your issues on https://github.com/orendalabs/cartesian-ng-axis/issues.
 
 # ng-axis
 

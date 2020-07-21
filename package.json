@@ -29,10 +29,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/orendalabs/ng-axis"
+    "url": "https://github.com/orendalabs/cartesian-ng-axis"
   },
   "bugs": {
-    "url": "https://github.com/orendalabs/ng-axis/issues"
+    "url": "https://github.com/orendalabs/cartesian-ng-axis/issues"
   },
   "dependencies": {
     "@angular/animations": "~10.0.4",
