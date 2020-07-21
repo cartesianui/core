@@ -1,6 +1,6 @@
 {
   "name": "@cartesian-ui/ng-axis",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Serve as y-axis for cartesian-ui project.",
   "license": "MIT",
   "keywords": [
@@ -17,8 +17,8 @@
   "author": "Syed Ali Murtaza Kazmi <ali@kazmi.me>",
   "contributors": [
     {
-      "name" : "Aftab Khan",
-      "url" : "https://github.com/Aaftab-khan/"
+      "name": "Aftab Khan",
+      "url": "https://github.com/Aaftab-khan/"
     }
   ],
   "bugs": {
@@ -30,5 +30,8 @@
     "@angular/common": "^9.0.7",
     "@angular/core": "^9.0.7",
     "tslib": "^1.10.0"
+  },
+  "dependencies": {
+    "@angular/common": "^9.0.7"
   }
 }
