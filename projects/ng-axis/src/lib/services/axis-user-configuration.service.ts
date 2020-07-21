@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../node_modules/@orendalabs/js-axis/axis.d.ts"/>
+﻿///<reference path="../../../../../node_modules/@cartesian-ui/js-axis/axis.d.ts"/>
 
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
