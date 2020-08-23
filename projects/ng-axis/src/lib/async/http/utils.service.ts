@@ -1,8 +1,7 @@
 import {
   HttpHeaders,
-  HttpRequest,
   HttpResponse
-}                     from "@angular/common/http"; // URLSearchParams,
+}                     from "@angular/common/http";
 import { Observable } from "rxjs";
 import { HttpService } from "./http.service";
 
@@ -19,16 +18,7 @@ export function methodBuilder(method: string) {
         const body:    string          = createBody(pBody, descriptor, args);
         const resUrl:  string          = createPath(url, pPath, args);
         const headers: HttpHeaders     = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
-        //const search:  URLSearchParams = createQuery(pQuery, args);
-
-        // Request options
-        // var options = new RequestOptions({
-        //   method,
-        //   url: this.getBaseUrl() + resUrl,
-        //   headers,
-        //   body,
-        //   search
-        // });
+        //const search:  URLSearchParams = createQuery(pQuery, args); // use HttpParam instead
 
         const options_ : any = {
           body: body,
@@ -37,13 +27,13 @@ export function methodBuilder(method: string) {
           headers: headers
         };
 
-        let req = new HttpRequest(method, this.getBaseUrl() + resUrl, options_);
+        // let req = new HttpRequest(method, this.getBaseUrl() + resUrl, options_);
 
         // intercept the request
         // this.requestInterceptor(req);
 
         // make the request and store the observable for later transformation
-        let observable: Observable<HttpResponse<any>> = this.http.request(req);
+        let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options_);
 
         // intercept the response
         observable = this.responseInterceptor(observable, descriptor.adapter);
