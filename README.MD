@@ -1,53 +1,28 @@
-# Important
+# @cartesian-ui/ng-axis
 
-Issues of this repository are tracked on https://github.com/orendalabs/cartesian-ng-axs. Please create your issues on https://github.com/orendalabs/cartesian-ng-axis/issues.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.7.
 
-# ng-axis
+## Code scaffolding
 
-## Installation
+Run `ng generate component component-name --project ng-axis` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ng-axis`.
+> Note: Don't forget to add `--project ng-axis` or else it will be added to the default project in your `angular.json` file.
 
-To install this library, run:
+## Development/Build
 
-```bash
-$ npm i @cartesian-ui/ng-axis --save
-```
-## Development
-
-To generate all `*.js`, `*.js.map` and `*.d.ts` files:
+To generate all `*.js`, `*.js.map` and `*.d.ts` files. The build artifacts will be stored in the `dist/` directory.
 
 ```bash
 $ ng build ng-axis --prod
 ```
 
-## AxisHttpInterceptor
+## Publishing
 
-In order to use AxisHttpInterceptor, first import it into module like below;
+After building your library with `ng build ng-axis`, go to the dist folder `cd dist/ng-axis` and run `npm publish`.
 
-```ts
-import { AxisHttpInterceptor } from '@cartesian-ui/ng-axis';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-```
+## Running unit tests
 
-then, add it to your module providers like below;
+Run `ng test ng-axis` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-```ts
-imports: [
-    ///other imports
-],
-providers: [
-    ///other providers
-    { provide: HTTP_INTERCEPTORS, useClass: AxisHttpInterceptor, multi: true }
-]
-```
+## Further help
 
-## AxisMultiTenancyService
-
-Import any other service e.g. AxisMultiTenancyService
-
-```ts
-import { AxisMultiTenancyService } from '@cartesian-ui/ng-axis';
-```
-
-## License
-
-MIT
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
