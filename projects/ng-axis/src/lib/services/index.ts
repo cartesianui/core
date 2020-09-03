@@ -10,4 +10,5 @@ export * from "./session/axis-session.service";
 export * from "./settings/setting.service";
 export * from "./utils/utils.service";
 export * from "./utils/validation.service";
+export * from "./utils/helpers";
 export * from "./axis-user-configuration.service";
