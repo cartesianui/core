@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { 
+import {
   FormControl,
   FormGroup
 }                     from '@angular/forms';
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class ValidationService {
 
   /**
