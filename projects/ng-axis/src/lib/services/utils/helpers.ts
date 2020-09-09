@@ -51,6 +51,56 @@ export function isObject(val: any) {
 
 
 /**
+ * Returns true if the given value is type of Array
+ *
+ * @param val
+ */
+export function isArray(a) {
+  return Array.isArray(a);
+};
+
+
+/**
+ * Returns converted string (from snake to camel)
+ *
+ * @param val
+ */
+function  toCamel(s){
+  return s.replace(/([-_][a-z])/ig, ($1) => {
+    return $1.toUpperCase()
+      .replace('-', '')
+      .replace('_', '');
+  });
+};
+
+
+/**
+ * Returns converted object (keys converted from snake to camel)
+ *
+ * @param val
+ */
+export function convertObjectKeysToCamel(o) {
+  if (isObject(o)) {
+    const n = {};
+
+    Object.keys(o)
+      .forEach((k) => {
+        n[toCamel(k)] = convertObjectKeysToCamel(o[k]);
+      });
+
+    return n;
+  } else if (isArray(o)) {
+    return o.map((i) => {
+      return convertObjectKeysToCamel(i);
+    });
+  }
+
+  return o;
+};
+
+
+
+/**
  * Capitalizes the first character in given string
  *
  * @param s
