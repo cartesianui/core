@@ -94,10 +94,7 @@ export class AxisHttpConfigurationService {
     }
   }
 
-  handleAxisResponse(
-    response: HttpResponse<any>,
-    ajaxResponse: IAjaxResponse
-  ): HttpResponse<any> {
+  handleAxisResponse(response: HttpResponse<any>, ajaxResponse: IAjaxResponse): HttpResponse<any> {
     var newResponse: HttpResponse<any>;
 
     if (ajaxResponse.success) {

@@ -32,10 +32,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     this.configuration = configuration;
   }
 
-  intercept(
-    request: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     var modifiedRequest = this.normalizeRequestHeaders(request);
     return next.handle(modifiedRequest).pipe(
       catchError((error) => {
@@ -61,15 +58,9 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
-    null
-  );
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  private tryAuthWithRefreshToken(
-    request: HttpRequest<any>,
-    next: HttpHandler,
-    error: any
-  ) {
+  private tryAuthWithRefreshToken(request: HttpRequest<any>, next: HttpHandler, error: any) {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
@@ -98,9 +89,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     }
   }
 
-  protected normalizeRequestHeaders(
-    request: HttpRequest<any>
-  ): HttpRequest<any> {
+  protected normalizeRequestHeaders(request: HttpRequest<any>): HttpRequest<any> {
     var modifiedHeaders = new HttpHeaders();
     modifiedHeaders = request.headers
       .set("Pragma", "no-cache")
@@ -187,9 +176,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     return headers;
   }
 
-  protected handleSuccessResponse(
-    event: HttpEvent<any>
-  ): Observable<HttpEvent<any>> {
+  protected handleSuccessResponse(event: HttpEvent<any>): Observable<HttpEvent<any>> {
     var self = this;
 
     if (event instanceof HttpResponse) {
@@ -234,9 +221,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
           body: errorBody,
         });
 
-        var ajaxResponse = this.configuration.getAxisAjaxResponseOrNull(
-          errorResponse
-        );
+        var ajaxResponse = this.configuration.getAxisAjaxResponseOrNull(errorResponse);
 
         if (ajaxResponse != null) {
           this.configuration.handleAxisResponse(errorResponse, ajaxResponse);
