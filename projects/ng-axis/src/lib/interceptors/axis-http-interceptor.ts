@@ -16,6 +16,7 @@ import { switchMap, filter, take, catchError, tap, map } from "rxjs/operators";
 import { throwError } from "rxjs";
 import { AxisHttpConfigurationService } from "./axis-http-configuration.service";
 import { RefreshTokenService } from "./refresh-token.service";
+
 declare const axis: any;
 
 @Injectable()
@@ -185,7 +186,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
         event.body.type &&
         event.body.type.indexOf("application/json") >= 0
       ) {
-        return self.configuration.blobToText(event.body).pipe(
+        return self.configuration.extractContent(event.body).pipe(
           map((json) => {
             const responseBody = json == "null" ? {} : JSON.parse(json);
 
@@ -208,17 +209,14 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleErrorResponse(error: any): Observable<never> {
-    if (!(error.error instanceof Blob)) {
-      return throwError(error);
-    }
 
-    return this.configuration.blobToText(error.error).pipe(
+    return this.configuration.extractContent(error.error).pipe(
       switchMap((json) => {
         const errorBody = json == "" || json == "null" ? {} : JSON.parse(json);
         const errorResponse = new HttpResponse({
           headers: error.headers,
           status: error.status,
-          body: errorBody,
+          body: errorBody
         });
 
         var ajaxResponse = this.configuration.getAxisAjaxResponseOrNull(errorResponse);
