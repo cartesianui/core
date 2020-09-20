@@ -1,7 +1,8 @@
 import { HttpResponse } from '@angular/common/http';
-import {Observable, of as _observableOf} from "rxjs";
-import {throwError as _observableThrow} from "rxjs";
-import {mergeMap as _observableMergeMap} from "rxjs/operators";
+import { Observable, of as _observableOf } from "rxjs";
+import { throwError as _observableThrow } from "rxjs";
+import { mergeMap as _observableMergeMap } from "rxjs/operators";
+import { extractContent } from "../../services/utils/helpers";
 
 export class HttpAdapter {
 
@@ -23,7 +24,7 @@ export class HttpAdapter {
     }
 
     if (status === 200) {
-      return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+      return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
         let result: any = null;
         let resultData = _responseText === "" ? null : JSON.parse(_responseText);
         result =  adapterFn
@@ -32,10 +33,11 @@ export class HttpAdapter {
         return _observableOf(result);
       }));
     } else if (status !== 200 && status !== 204) {
-      return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+      return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
       }));
     }
+
     return _observableOf<any>(<any>null);
   }
 }
@@ -69,20 +71,4 @@ function throwException(message: string, status: number, response: string, heade
     return _observableThrow(result);
   else
     return _observableThrow(new ApiException(message, status, response, headers, null));
-}
-
-function blobToText(blob: any): Observable<string> {
-  return new Observable<string>((observer: any) => {
-    if (!blob) {
-      observer.next("");
-      observer.complete();
-    } else {
-      let reader = new FileReader();
-      reader.onload = event => {
-        observer.next((<any>event.target).result);
-        observer.complete();
-      };
-      reader.readAsText(blob);
-    }
-  });
 }
