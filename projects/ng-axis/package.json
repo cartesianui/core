@@ -1,10 +1,9 @@
 {
   "name": "@cartesian-ui/ng-axis",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "peerDependencies": {
-    "@angular/common": "^10.0.4",
-    "@angular/core": "^10.0.4",
-    "ngx-toastr": "^13.0.0",
+    "@angular/common": "^10.1.2",
+    "@angular/core": "^10.1.2",
     "tslib": "^2.0.0"
   }
 }

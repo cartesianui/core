@@ -13,7 +13,7 @@ import {
   HttpHeaders,
 } from "@angular/common/http";
 import { switchMap, filter, take, catchError, tap, map } from "rxjs/operators";
-import { throwError } from "rxjs/internal/observable/throwError";
+import { throwError } from "rxjs";
 import { AxisHttpConfigurationService } from "./axis-http-configuration.service";
 import { RefreshTokenService } from "./refresh-token.service";
 declare const axis: any;

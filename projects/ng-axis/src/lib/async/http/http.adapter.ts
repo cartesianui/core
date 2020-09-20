@@ -1,6 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
 import {Observable, of as _observableOf} from "rxjs";
-import {throwError as _observableThrow} from "rxjs/internal/observable/throwError";
+import {throwError as _observableThrow} from "rxjs";
 import {mergeMap as _observableMergeMap} from "rxjs/operators";
 
 export class HttpAdapter {
