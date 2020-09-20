@@ -4,7 +4,7 @@
   "peerDependencies": {
     "@angular/common": "^10.1.2",
     "@angular/core": "^10.1.2",
-    "@cartesian-ui/js-axis": "^2.1.1",
+    "@cartesian-ui/js-axis": "^2.1.2",
     "tslib": "^2.0.0"
   }
 }
