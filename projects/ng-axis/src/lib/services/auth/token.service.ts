@@ -22,7 +22,6 @@ export class TokenService {
     axis.auth.setToken(authToken, expireDate);
   }
 
-  //refresh token
   getRefreshToken(): string {
     return axis.auth.getRefreshToken();
   }

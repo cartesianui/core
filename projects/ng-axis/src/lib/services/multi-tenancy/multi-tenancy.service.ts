@@ -10,11 +10,11 @@ export class MultiTenancyService {
     return axis.multiTenancy.isEnabled;
   }
 
-  get getTenantId(): string {
+  getTenantId(): string {
     return axis.multiTenancy.getTenantIdCookie();
   }
 
-  set setTenantId(tenantId) {
+  setTenantId(tenantId) {
     axis.multiTenancy.setTenantIdCookie(tenantId);
   }
 }
