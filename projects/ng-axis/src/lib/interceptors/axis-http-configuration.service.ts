@@ -4,6 +4,7 @@ import { MessageService } from "../services/message/message.service";
 import { LogService } from "../services/log/log.service";
 import { HttpResponse } from "@angular/common/http";
 import { IErrorInfo, IAjaxResponse } from "../models";
+import { extractContent } from "../services/utils/helpers";
 
 @Injectable({
   providedIn: "root",
@@ -35,6 +36,11 @@ export class AxisHttpConfigurationService {
     details: "The resource requested could not be found on the server.",
   };
 
+  defaultError504 = <IErrorInfo>{
+    message: "Gateway Timeout!",
+    details: "Server is not responding, try again after sometime.",
+  };
+
   logError(error: IErrorInfo): void {
     this._logService.error(error);
   }
@@ -54,9 +60,9 @@ export class AxisHttpConfigurationService {
 
   handleTargetUrl(targetUrl: string): void {
     if (!targetUrl) {
-      location.href = "/";
+      // location.href = "/";
     } else {
-      location.href = targetUrl;
+      // location.href = targetUrl;
     }
   }
 
@@ -87,6 +93,9 @@ export class AxisHttpConfigurationService {
         break;
       case 404:
         self.showError(self.defaultError404);
+        break;
+      case 504:
+        self.showError(self.defaultError504);
         break;
       default:
         self.showError(self.defaultError);
@@ -160,19 +169,7 @@ export class AxisHttpConfigurationService {
     return this.handleAxisResponse(response, ajaxResponse);
   }
 
-  blobToText(blob: any): Observable<string> {
-    return new Observable<string>((observer: any) => {
-      if (!blob) {
-        observer.next("");
-        observer.complete();
-      } else {
-        let reader = new FileReader();
-        reader.onload = function () {
-          observer.next(this.result);
-          observer.complete();
-        };
-        reader.readAsText(blob);
-      }
-    });
+  extractContent(content: any): Observable<string> {
+    return extractContent(content);
   }
 }
