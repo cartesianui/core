@@ -1,3 +1,5 @@
+import { Observable } from "rxjs";
+
 let typeCache: { [label: string]: boolean } = {};
 
 type Predicate = (oldValues: Array<any>, newValues: Array<any>) => boolean;
@@ -159,4 +161,31 @@ export function flattenObject(ob: any, preservePath: boolean = false): any {
 export function localeDateString(dateString: string, culture: string = 'en-EN'): string {
   let date = new Date(dateString);
   return date.toLocaleDateString(culture);
+}
+
+
+export function extractContent(content: any): Observable<string> {
+  return new Observable<string>((observer: any) => {
+    if (!content) {
+      observer.next("");
+      observer.complete();
+
+    } else if (content instanceof Blob) {
+      let reader = new FileReader();
+      reader.onload = function () {
+        observer.next(this.result);
+        observer.complete();
+      };
+      reader.readAsText(content);
+
+    } else {
+      if(typeof content === "string"){
+        observer.next(JSON.stringify({ message: content }));
+        observer.complete();
+      } else if(typeof content === "object"){
+        observer.next(JSON.stringify(content));
+        observer.complete();
+      }
+    }
+  });
 }
