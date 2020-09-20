@@ -8,5 +8,6 @@ export * from "./multi-tenancy/multi-tenancy.service";
 export * from "./notify/notify.service";
 export * from "./settings/setting.service";
 export * from "./utils/utils.service";
+export * from "./utils/ui.service";
 export * from "./utils/validation.service";
 export * from "./utils/helpers";
