@@ -63,6 +63,16 @@ export function isArray(a) {
 
 
 /**
+ * Returns true if the given value is type of string
+ *
+ * @param val
+ */
+export function isString(x: any): x is string {
+  return typeof x === "string";
+}
+
+
+/**
  * Returns converted string (from snake to camel)
  *
  * @param val
