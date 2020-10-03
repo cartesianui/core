@@ -114,6 +114,11 @@ export var Path = paramBuilder("Path");
  */
 export var Query = paramBuilder("Query");
 /**
+ * Request Criteria of a REST method, type: key-value pair object
+ * Only one criteria per method!
+ */
+export var Criteria = paramBuilder("Criteria")("Criteria");
+/**
  * Body of a REST method, type: key-value pair object
  * Only one body per method!
  */

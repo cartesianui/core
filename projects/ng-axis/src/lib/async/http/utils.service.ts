@@ -1,39 +1,43 @@
-import {
-  HttpHeaders,
-  HttpResponse
-}                     from "@angular/common/http";
+import { HttpHeaders, HttpParams, HttpResponse} from "@angular/common/http";
 import { Observable } from "rxjs";
 import { HttpService } from "./http.service";
+import { RequestCriteria } from "./http.criteria";
 
 export function methodBuilder(method: string) {
   return function(url: string) {
     return function(target: HttpService, propertyKey: string, descriptor: any) {
 
-      const pPath   = target[`${propertyKey}_Path_parameters`],
-            pQuery  = target[`${propertyKey}_Query_parameters`],
-            pBody   = target[`${propertyKey}_Body_parameters`],
-            pHeader = target[`${propertyKey}_Header_parameters`];
+      const pPath     = target[`${propertyKey}_Path_parameters`],
+            pQuery    = target[`${propertyKey}_Query_parameters`],
+            pBody     = target[`${propertyKey}_Body_parameters`],
+            pHeader   = target[`${propertyKey}_Header_parameters`],
+            pCriteria = target[`${propertyKey}_Criteria_parameters`];
 
       descriptor.value = function(...args: any[]) {
-        const body:    string          = createBody(pBody, descriptor, args);
-        const resUrl:  string          = createPath(url, pPath, args);
-        const headers: HttpHeaders     = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
-        //const search:  URLSearchParams = createQuery(pQuery, args); // use HttpParam instead
+        const body:    string       = createBody(pBody, descriptor, args);
+        const resUrl:  string       = createPath(url, pPath, args);
+        const headers: HttpHeaders  = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
+        const params:  HttpParams | boolean = createCriteria(pCriteria, args);
+        const search:  HttpParams = createQuery(pQuery, args);
 
-        const options_ : any = {
+        const options : any = {
           body: body,
           observe: "response",
           responseType: "blob",
           headers: headers
         };
 
-        // let req = new HttpRequest(method, this.getBaseUrl() + resUrl, options_);
+        if(params && params instanceof HttpParams) {
+          options.params = params;
+        }
+
+        // let req = new HttpRequest(method, this.getBaseUrl() + resUrl, options);
 
         // intercept the request
         // this.requestInterceptor(req);
 
         // make the request and store the observable for later transformation
-        let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options_);
+        let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options);
 
         // intercept the response
         observable = this.responseInterceptor(observable, descriptor.adapter);
@@ -80,24 +84,33 @@ function createPath(url: string, pPath: Array<any>, args: Array<any>): string {
   return resUrl;
 }
 
-function createQuery(pQuery: any, args: Array<any>): URLSearchParams {
-  var search = new URLSearchParams();
-
+function createQuery(pQuery: any, args: Array<any>): HttpParams {
+  let params = new HttpParams();
   if (pQuery) {
     pQuery
     .filter(p => args[p.parameterIndex]) // filter out optional parameters
     .forEach(p => {
-      var key = p.key;
-      var value = args[p.parameterIndex];
+      let key = p.key;
+      let value = args[p.parameterIndex];
       // if the value is a instance of Object, we stringify it
       if (value instanceof Object) {
         value = JSON.stringify(value);
       }
-      search.set(encodeURIComponent(key), encodeURIComponent(value));
+      params = params.append(encodeURIComponent(key), encodeURIComponent(value));
     });
   }
 
-  return search;
+  return params;
+}
+
+function createCriteria(pCriteria: RequestCriteria<any>, args: Array<any>): HttpParams | boolean {
+  if(pCriteria && pCriteria[0] && args[pCriteria[0].parameterIndex] && args[pCriteria[0].parameterIndex] instanceof RequestCriteria) {
+    const criteria = args[pCriteria[0].parameterIndex].toString();
+    const httpParams = new HttpParams({ fromString: criteria });
+    return httpParams;
+  }
+
+  return false;
 }
 
 function createHeaders(pHeader: any, descriptor: any, defaultHeaders: any, args: Array<any>): HttpHeaders {
