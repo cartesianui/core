@@ -117,7 +117,7 @@ export class RequestCriteria<SearchForm> {
     if(this.form) {
       for (const field in this.form) {
         const data = this.form[field];
-        if(data){
+        if(data['value']){
           this.where(data['column'], data['operator'], data['value'])
         }
       }
