@@ -1,6 +1,6 @@
 # @cartesian-ui/ng-axis
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.7.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.2
 
 ## Code scaffolding
 
