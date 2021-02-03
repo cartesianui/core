@@ -156,6 +156,7 @@ export class RequestCriteria<SearchForm> {
       orderBy,
       sortedBy,
       with: this.relations,
+      include: this.relations,
       filter: this.filters,
       page: [this.pageNo],
       limit: [this.limitPerPage],
