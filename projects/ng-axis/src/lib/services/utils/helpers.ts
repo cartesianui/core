@@ -78,7 +78,7 @@ export function isString(x: any): x is string {
  * @param val
  */
 function  toCamel(s){
-  return s.replace(/([-_][a-z])/ig, ($1) => {
+  return s.replace(/([-_][a-z0-9])/ig, ($1) => {
     return $1.toUpperCase()
       .replace('-', '')
       .replace('_', '');

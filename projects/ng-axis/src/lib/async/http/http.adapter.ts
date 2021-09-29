@@ -23,7 +23,7 @@ export class HttpAdapter {
       }
     }
 
-    if (status === 200) {
+    if (status === 200 || status === 202) {
       return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
         let result: any = null;
         let resultData = _responseText === "" ? null : JSON.parse(_responseText);
