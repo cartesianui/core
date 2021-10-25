@@ -54,6 +54,11 @@ export var POST = methodBuilder("POST");
  */
 export var PUT = methodBuilder("PUT");
 /**
+ * PATCH method
+ * @param {string} url - resource url of the method
+ */
+export var PATCH = methodBuilder("PATCH");
+/**
  * DELETE method
  * @param {string} url - resource url of the method
  */

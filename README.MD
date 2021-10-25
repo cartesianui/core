@@ -12,12 +12,17 @@ Run `ng generate component component-name --project ng-axis` to generate a new c
 To generate all `*.js`, `*.js.map` and `*.d.ts` files. The build artifacts will be stored in the `dist/` directory.
 
 ```bash
-$ ng build ng-axis --configuration production
+$ npm run build:prod
 ```
 
 ## Publishing
 
-After building your library with `ng build ng-axis --configuration production`, go to the dist folder `cd dist/ng-axis` and run `npm publish`.
+After building your library, go to the dist folder `cd dist/ng-axis` and run `npm publish` or run below command
+
+## Build and Publish (Short Command)
+```bash
+$ npm run publish
+```
 
 ## Running unit tests
 
