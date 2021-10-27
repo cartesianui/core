@@ -92,21 +92,18 @@ function  toCamel(s){
  * @param val
  */
 export function convertObjectKeysToCamel(o) {
-  if (isObject(o)) {
+  if (isArray(o)) {
+    return o.map((i) => {
+      return convertObjectKeysToCamel(i);
+    });
+  } else if (isObject(o)) {
     const n = {};
-
     Object.keys(o)
       .forEach((k) => {
         n[toCamel(k)] = convertObjectKeysToCamel(o[k]);
       });
-
     return n;
-  } else if (isArray(o)) {
-    return o.map((i) => {
-      return convertObjectKeysToCamel(i);
-    });
   }
-
   return o;
 };
 
