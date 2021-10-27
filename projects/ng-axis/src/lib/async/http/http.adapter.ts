@@ -3,6 +3,7 @@ import { Observable, of as _observableOf } from "rxjs";
 import { throwError as _observableThrow } from "rxjs";
 import { mergeMap as _observableMergeMap } from "rxjs/operators";
 import { extractContent } from "../../services/utils/helpers";
+import { AppConstants }         from '../../app-constants';
 
 export class HttpAdapter {
 
@@ -23,7 +24,7 @@ export class HttpAdapter {
       }
     }
 
-    if (status === 200 || status === 202) {
+    if (AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
       return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
         let result: any = null;
         let resultData = _responseText === "" ? null : JSON.parse(_responseText);
@@ -32,7 +33,7 @@ export class HttpAdapter {
                     : resultData;
         return _observableOf(result);
       }));
-    } else if (status !== 200 && status !== 204) {
+    } else if (!AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
       return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
         return throwException("An unexpected server error occurred.", status, _responseText, _headers);
       }));
