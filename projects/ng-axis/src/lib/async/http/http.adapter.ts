@@ -2,7 +2,7 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of as _observableOf } from "rxjs";
 import { throwError as _observableThrow } from "rxjs";
 import { mergeMap as _observableMergeMap } from "rxjs/operators";
-import { extractContent } from "../../services/utils/helpers";
+import { extractContent, convertObjectKeysToCamel } from "../../services/utils/helpers";
 import { AppConstants }         from '../../app-constants';
 
 export class HttpAdapter {
@@ -26,11 +26,20 @@ export class HttpAdapter {
 
     if (AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
       return extractContent(responseBlob).pipe(_observableMergeMap(_responseText => {
+
         let result: any = null;
         let resultData = _responseText === "" ? null : JSON.parse(_responseText);
+
+        // If Adaptor function provided call that, otherwise return result data
         result =  adapterFn
                     ? adapterFn.call(undefined, resultData)
                     : resultData;
+
+        // If response key settings to convert response key to camel case is true, apply converter
+        if(AppConstants.convertResponseKeysToCamelCase) {
+          result = HttpAdapter.convertResponseObjectKeysToCamel(result)
+        }
+
         return _observableOf(result);
       }));
     } else if (!AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
@@ -40,6 +49,10 @@ export class HttpAdapter {
     }
 
     return _observableOf<any>(<any>null);
+  }
+
+  static convertResponseObjectKeysToCamel(response: any){
+    return Object.assign({}, response, convertObjectKeysToCamel(response));
   }
 }
 
