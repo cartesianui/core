@@ -4,7 +4,9 @@ import {Injectable} from "@angular/core";
 export class AppConstants {
 
   static remoteServiceBaseUrl: string = "";
+
   static appBaseUrl: string = "";
+
   static appBaseHref: string = ""; // returns angular's base-href parameter value if used during the publish
 
   static localeMappings: any = [];
@@ -21,7 +23,7 @@ export class AppConstants {
     encryptedAuthTokenName: "" // enc_auth_token
   };
 
-  static readonly defaultHttpSuccessCodes = {
+  static defaultHttpSuccessCodes: any = {
     "100" : { "code" : 100, "message" : "Continue" },
     "101" : { "code" : 101, "message" : "Switching Protocols" },
     "102" : { "code" : 102, "message" : "Processing" },
@@ -44,7 +46,7 @@ export class AppConstants {
     "307" : { "code" : 307, "message" : "Temporary Redirect" }
   };
 
-  static readonly defaultHttpErrorCodes = {
+  static defaultHttpErrorCodes: any = {
     "400" : { "code" : 400, "message" : "Bad Request" },
     "401" : { "code" : 401, "message" : "Unauthorized" },
     "402" : { "code" : 402, "message" : "Payment Required" },
@@ -84,4 +86,6 @@ export class AppConstants {
     "508" : { "code" : 508, "message" : "Loop Detected" },
     "511" : { "code" : 511, "message" : "Network Authentication Required" }
   };
+
+  static convertResponseKeysToCamelCase: boolean = true;
 }
