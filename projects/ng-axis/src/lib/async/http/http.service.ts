@@ -7,7 +7,7 @@ import { Observable, throwError as _observableThrow } from "rxjs";
 import { mergeMap as _observableMergeMap, catchError as _observableCatch } from "rxjs/operators";
 import { HttpAdapter }          from './http.adapter';
 import { AppConstants }         from '../../app-constants';
-import {convertObjectKeysToCamel, convertObjectKeysToSnake} from "../../services";
+import { convertObjectKeysToSnake, isObject } from '../../services';
 
 /**
  * Supported @Produces media types
@@ -30,6 +30,18 @@ export class HttpService {
     return null;
   }
 
+  protected convertRequestBodyObjectKeysToSnake(object: any){
+
+    // If it is object, stringy to get rid of object functions etc
+    // If not object, means it is already stringfied, no need to do it again, it will result in error
+    // then JSON.parse to get simple JSON object
+    if(isObject(object)){
+      object = JSON.stringify(object);
+    }
+
+    return Object.assign({}, convertObjectKeysToSnake(JSON.parse(object)));
+  }
+
   /**
   * Request Interceptor
   *
@@ -38,16 +50,11 @@ export class HttpService {
   */
   protected requestInterceptor(requestOptions: any) {
 
-    // check request keys conversion settings
-    if(AppConstants.responseObjectKeys.convert && requestOptions.body !== undefined) {
-      if(AppConstants.responseObjectKeys.targetCase === 'camelCase') {
-        requestOptions.body = HttpService.convertRequestObjectKeysToCamel(requestOptions.body);
-      } else if(AppConstants.responseObjectKeys.targetCase === 'snake_case') {
-        requestOptions.body = HttpService.convertRequestObjectKeysToSnake(requestOptions.body);
-      }
+    if(AppConstants.convertRequestObjectKeysToSnake){
+      requestOptions.body = this.convertRequestBodyObjectKeysToSnake(requestOptions.body);
     }
 
-    return requestOptions
+    return requestOptions;
   }
 
   /**
@@ -72,12 +79,5 @@ export class HttpService {
     }));
   }
 
-  static convertRequestObjectKeysToCamel(response: any){
-    return Object.assign({}, response, convertObjectKeysToCamel(response));
-  }
-
-  static convertRequestObjectKeysToSnake(response: any){
-    return Object.assign({}, response, convertObjectKeysToSnake(response));
-  }
 }
 

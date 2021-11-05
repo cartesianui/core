@@ -36,12 +36,8 @@ export class HttpAdapter {
                     : resultData;
 
         // check response keys conversion settings
-        if(AppConstants.requestObjectKeys.convert) {
-          if(AppConstants.requestObjectKeys.targetCase === 'snake_case') {
-            result = HttpAdapter.convertResponseObjectKeysToSnake(result);
-          } else if(AppConstants.requestObjectKeys.targetCase === 'camelCase') {
-            result = HttpAdapter.convertResponseObjectKeysToCamel(result);
-          }
+        if(AppConstants.convertResponseObjectKeysToCamel) {
+          result = HttpAdapter.convertResponseObjectKeysToCamel(result);
         }
 
         return _observableOf(result);
@@ -56,11 +52,7 @@ export class HttpAdapter {
   }
 
   static convertResponseObjectKeysToCamel(response: any){
-    return Object.assign({}, response, convertObjectKeysToCamel(response));
-  }
-
-  static convertResponseObjectKeysToSnake(response: any){
-    return Object.assign({}, response, convertObjectKeysToSnake(response));
+    return Object.assign({}, convertObjectKeysToCamel(response));
   }
 }
 

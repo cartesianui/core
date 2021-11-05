@@ -93,7 +93,7 @@ function  toCamel(s){
  */
 function  toSnake(s){
   return s.replace(/[A-Z]/g, (letter) => {
-    `_${letter.toLowerCase()}`
+    return `_${letter.toLowerCase()}`
   });
 };
 
