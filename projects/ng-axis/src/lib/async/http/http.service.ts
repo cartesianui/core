@@ -1,14 +1,13 @@
 import { Injectable }           from "@angular/core";
 import {
   HttpClient,
-  HttpRequest,
-  HttpResponse,
-  HttpResponseBase
+  HttpResponse
 }                               from "@angular/common/http";
 import { Observable, throwError as _observableThrow } from "rxjs";
-import { map as _observableMap, mergeMap as _observableMergeMap, catchError as _observableCatch } from "rxjs/operators";
+import { mergeMap as _observableMergeMap, catchError as _observableCatch } from "rxjs/operators";
 import { HttpAdapter }          from './http.adapter';
 import { AppConstants }         from '../../app-constants';
+import {convertObjectKeysToCamel, convertObjectKeysToSnake} from "../../services";
 
 /**
  * Supported @Produces media types
@@ -37,7 +36,19 @@ export class HttpService {
   * @method requestInterceptor
   * @param {Request} req - request object
   */
-  protected requestInterceptor(req: HttpRequest<any>) {}
+  protected requestInterceptor(requestOptions: any) {
+
+    // check request keys conversion settings
+    if(AppConstants.responseObjectKeys.convert && requestOptions.body !== undefined) {
+      if(AppConstants.responseObjectKeys.targetCase === 'camelCase') {
+        requestOptions.body = HttpService.convertRequestObjectKeysToCamel(requestOptions.body);
+      } else if(AppConstants.responseObjectKeys.targetCase === 'snake_case') {
+        requestOptions.body = HttpService.convertRequestObjectKeysToSnake(requestOptions.body);
+      }
+    }
+
+    return requestOptions
+  }
 
   /**
   * Response Interceptor
@@ -59,6 +70,14 @@ export class HttpService {
       } else
         return <Observable<any>><any>_observableThrow(response_);
     }));
+  }
+
+  static convertRequestObjectKeysToCamel(response: any){
+    return Object.assign({}, response, convertObjectKeysToCamel(response));
+  }
+
+  static convertRequestObjectKeysToSnake(response: any){
+    return Object.assign({}, response, convertObjectKeysToSnake(response));
   }
 }
 

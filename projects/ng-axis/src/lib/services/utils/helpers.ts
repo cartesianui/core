@@ -87,6 +87,18 @@ function  toCamel(s){
 
 
 /**
+ * Returns converted string (from snake to camel)
+ *
+ * @param val
+ */
+function  toSnake(s){
+  return s.replace(/[A-Z]/g, (letter) => {
+    `_${letter.toLowerCase()}`
+  });
+};
+
+
+/**
  * Returns converted object (keys converted from snake to camel)
  *
  * @param val
@@ -107,6 +119,27 @@ export function convertObjectKeysToCamel(o) {
   return o;
 };
 
+
+/**
+ * Returns converted object (keys converted from camel to snake)
+ *
+ * @param val
+ */
+export function convertObjectKeysToSnake(o) {
+  if (isArray(o)) {
+    return o.map((i) => {
+      return convertObjectKeysToSnake(i);
+    });
+  } else if (isObject(o)) {
+    const n = {};
+    Object.keys(o)
+      .forEach((k) => {
+        n[toSnake(k)] = convertObjectKeysToSnake(o[k]);
+      });
+    return n;
+  }
+  return o;
+};
 
 
 /**

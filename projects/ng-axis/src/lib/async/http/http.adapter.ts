@@ -2,7 +2,7 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable, of as _observableOf } from "rxjs";
 import { throwError as _observableThrow } from "rxjs";
 import { mergeMap as _observableMergeMap } from "rxjs/operators";
-import { extractContent, convertObjectKeysToCamel } from "../../services/utils/helpers";
+import { extractContent, convertObjectKeysToCamel, convertObjectKeysToSnake } from "../../services/utils/helpers";
 import { AppConstants }         from '../../app-constants';
 
 export class HttpAdapter {
@@ -35,9 +35,13 @@ export class HttpAdapter {
                     ? adapterFn.call(undefined, resultData)
                     : resultData;
 
-        // If response key settings to convert response key to camel case is true, apply converter
-        if(AppConstants.convertResponseKeysToCamelCase) {
-          result = HttpAdapter.convertResponseObjectKeysToCamel(result)
+        // check response keys conversion settings
+        if(AppConstants.requestObjectKeys.convert) {
+          if(AppConstants.requestObjectKeys.targetCase === 'snake_case') {
+            result = HttpAdapter.convertResponseObjectKeysToSnake(result);
+          } else if(AppConstants.requestObjectKeys.targetCase === 'camelCase') {
+            result = HttpAdapter.convertResponseObjectKeysToCamel(result);
+          }
         }
 
         return _observableOf(result);
@@ -53,6 +57,10 @@ export class HttpAdapter {
 
   static convertResponseObjectKeysToCamel(response: any){
     return Object.assign({}, response, convertObjectKeysToCamel(response));
+  }
+
+  static convertResponseObjectKeysToSnake(response: any){
+    return Object.assign({}, response, convertObjectKeysToSnake(response));
   }
 }
 

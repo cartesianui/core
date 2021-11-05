@@ -20,7 +20,7 @@ export function methodBuilder(method: string) {
         const params:  HttpParams | boolean = createCriteria(pCriteria, args);
         const search:  HttpParams = createQuery(pQuery, args);
 
-        const options : any = {
+        let options : any = {
           body: body,
           observe: "response",
           responseType: "blob",
@@ -31,10 +31,8 @@ export function methodBuilder(method: string) {
           options.params = params;
         }
 
-        // let req = new HttpRequest(method, this.getBaseUrl() + resUrl, options);
-
         // intercept the request
-        // this.requestInterceptor(req);
+        options = this.requestInterceptor(options);
 
         // make the request and store the observable for later transformation
         let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options);

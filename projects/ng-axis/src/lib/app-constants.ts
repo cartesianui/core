@@ -87,5 +87,15 @@ export class AppConstants {
     "511" : { "code" : 511, "message" : "Network Authentication Required" }
   };
 
-  static convertResponseKeysToCamelCase: boolean = true;
+  static requestObjectKeys: any = {
+    convert: true,
+    sourceCase: 'camelCase',
+    targetCase: 'snake_case'
+  };
+
+  static responseObjectKeys: any = {
+    convert: true,
+    sourceCase: 'snake_case',
+    targetCase: 'camelCase'
+  };
 }
