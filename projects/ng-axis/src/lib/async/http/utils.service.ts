@@ -2,6 +2,7 @@ import { HttpHeaders, HttpParams, HttpResponse} from "@angular/common/http";
 import { Observable } from "rxjs";
 import { HttpService } from "./http.service";
 import { RequestCriteria } from "./http.criteria";
+import { isObject } from '../../services';
 
 export function methodBuilder(method: string) {
   return function(url: string) {
@@ -64,8 +65,15 @@ export function paramBuilder(paramName: string) {
 }
 
 function createBody(pBody: Array<any>, descriptor: any, args: Array<any>): string {
-  if (descriptor.isFormData) return args[0];
-  return pBody ? JSON.stringify(args[pBody[0].parameterIndex]) : null;
+  if (descriptor.isFormData) {
+    return args[0];
+  } else {
+    if(pBody && isObject(args[pBody[0].parameterIndex])){
+      return JSON.stringify(args[pBody[0].parameterIndex])
+    } else {
+      return null
+    }
+  }
 }
 
 function createPath(url: string, pPath: Array<any>, args: Array<any>): string {
