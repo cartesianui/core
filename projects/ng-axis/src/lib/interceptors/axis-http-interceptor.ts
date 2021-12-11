@@ -102,6 +102,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     modifiedHeaders = this.addAspNetCoreCultureHeader(modifiedHeaders);
     modifiedHeaders = this.addAcceptLanguageHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantIdHeader(modifiedHeaders);
+    modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
 
     return request.clone({
       headers: modifiedHeaders,
@@ -150,6 +151,22 @@ export class AxisHttpInterceptor implements HttpInterceptor {
       headers = headers.set(
         axis.multiTenancy.tenantIdCookieName,
         cookieTenantIdValue
+      );
+    }
+
+    return headers;
+  }
+
+  protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
+    let hostAttribute = axis.multiTenancy.hostAttribute;
+    if (
+      hostAttribute &&
+      headers &&
+      !headers.has(hostAttribute)
+    ) {
+      headers = headers.set(
+        hostAttribute,
+        this.getHostName()
       );
     }
 
@@ -240,5 +257,12 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     }
 
     return false;
+  }
+
+  private getHostName(): string {
+    const port = document.location.port ? ':' + document.location.port : '';
+    return (
+      document.location.hostname + port
+    );
   }
 }
