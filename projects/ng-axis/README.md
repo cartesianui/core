@@ -33,12 +33,12 @@ providers: [
 ]
 ```
 
-## MultiTenancyService
+## TenancyService
 
-Import any other service e.g. MultiTenancyService
+Import any other service e.g. TenancyService
 
 ```ts
-import { MultiTenancyService } from '@cartesian-ui/ng-axis';
+import { TenancyService } from '@cartesian-ui/ng-axis';
 ```
 
 ## License

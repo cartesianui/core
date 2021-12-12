@@ -141,15 +141,15 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
   protected addTenantIdHeader(headers: HttpHeaders): HttpHeaders {
     let cookieTenantIdValue = this._utilsService.getCookieValue(
-      axis.multiTenancy.tenantIdCookieName
+      axis.tenancy.tenantIdCookieName
     );
     if (
       cookieTenantIdValue &&
       headers &&
-      !headers.has(axis.multiTenancy.tenantIdCookieName)
+      !headers.has(axis.tenancy.tenantIdCookieName)
     ) {
       headers = headers.set(
-        axis.multiTenancy.tenantIdCookieName,
+        axis.tenancy.tenantIdCookieName,
         cookieTenantIdValue
       );
     }
@@ -158,7 +158,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
-    let hostAttribute = axis.multiTenancy.hostAttribute;
+    let hostAttribute = axis.tenancy.hostAttribute;
     if (
       hostAttribute &&
       headers &&

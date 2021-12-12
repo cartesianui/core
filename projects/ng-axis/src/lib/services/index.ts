@@ -4,7 +4,7 @@ export * from "./features/feature-checker.service";
 export * from "./localization/localization.service";
 export * from "./log/log.service";
 export * from "./message/message.service";
-export * from "./multi-tenancy/multi-tenancy.service";
+export * from "./tenancy/tenancy.service";
 export * from "./notify/notify.service";
 export * from "./settings/setting.service";
 export * from "./utils/utils.service";

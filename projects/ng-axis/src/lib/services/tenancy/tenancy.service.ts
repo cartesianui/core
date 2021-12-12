@@ -5,16 +5,16 @@ import { Injectable } from "@angular/core";
 @Injectable({
   providedIn: "root",
 })
-export class MultiTenancyService {
+export class TenancyService {
   get isEnabled(): boolean {
-    return axis.multiTenancy.isEnabled;
+    return axis.tenancy.isEnabled;
   }
 
   getTenantId(): string {
-    return axis.multiTenancy.getTenantIdCookie();
+    return axis.tenancy.getTenantIdCookie();
   }
 
   setTenantId(tenantId) {
-    axis.multiTenancy.setTenantIdCookie(tenantId);
+    axis.tenancy.setTenantIdCookie(tenantId);
   }
 }
