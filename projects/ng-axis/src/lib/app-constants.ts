@@ -23,6 +23,11 @@ export class AppConstants {
     encryptedAuthTokenName: "" // enc_auth_token
   };
 
+  static tenancy = {
+    overwriteHeaderAttribute: false,
+    host: ""
+  };
+
   static defaultHttpSuccessCodes: any = {
     "100" : { "code" : 100, "message" : "Continue" },
     "101" : { "code" : 101, "message" : "Switching Protocols" },

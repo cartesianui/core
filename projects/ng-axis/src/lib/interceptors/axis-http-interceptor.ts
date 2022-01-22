@@ -3,6 +3,7 @@ import { Observable, of, BehaviorSubject } from "rxjs";
 import { LogService } from "../services/log/log.service";
 import { TokenService } from "../services/auth/token.service";
 import { UtilsService } from "../services/utils/utils.service";
+import { AppConstants } from "../app-constants";
 import {
   HttpInterceptor,
   HttpHandler,
@@ -158,16 +159,15 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
-    let hostAttribute = axis.tenancy.hostAttribute;
-    if (
-      hostAttribute &&
-      headers &&
-      !headers.has(hostAttribute)
-    ) {
-      headers = headers.set(
-        hostAttribute,
-        this.getHostName()
-      );
+    let headerAttribute = axis.tenancy.headerAttribute;
+    let tenancy = AppConstants.tenancy;
+
+    if (headerAttribute && headers && !headers.has(headerAttribute)) {
+      if (tenancy !== undefined && tenancy.overwriteHeaderAttribute) {
+        headers = headers.set( headerAttribute, tenancy.host);
+      } else {
+        headers = headers.set( headerAttribute, this.getHostName());
+      }
     }
 
     return headers;
