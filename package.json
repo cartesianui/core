@@ -2,9 +2,11 @@
   "name": "@cartesian-ui/ng-axis",
   "version": "4.18.0",
   "peerDependencies": {
-    "@angular/common": "^12.2.7",
-    "@angular/core": "^12.2.7",
-    "@cartesian-ui/js-axis": "^2.3.2",
+    "@angular/common": "^12.2.0",
+    "@angular/core": "^12.2.0",
+    "@cartesian-ui/js-axis": "^2.3.2"
+  },
+  "dependencies": {
     "tslib": "^2.3.1"
   }
 }

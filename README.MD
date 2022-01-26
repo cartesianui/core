@@ -1,11 +1,15 @@
 # @cartesian-ui/ng-axis
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.2
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
 ## Code scaffolding
 
 Run `ng generate component component-name --project ng-axis` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ng-axis`.
 > Note: Don't forget to add `--project ng-axis` or else it will be added to the default project in your `angular.json` file.
+
+## Build
+
+Run `ng build ng-axis` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ## Development/Build
 
@@ -19,11 +23,6 @@ $ npm run build:prod
 
 After building your library, go to the dist folder `cd dist/ng-axis` and run `npm publish` or run below command
 
-## Build and Publish (Short Command)
-```bash
-$ npm run publish
-```
-
 ## Running unit tests
 
 Run `ng test ng-axis` to execute the unit tests via [Karma](https://karma-runner.github.io).
@@ -34,8 +33,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 ------------------------------------------------
-
-# @cartesian-ui/ng-axis
 
 # Important
 
