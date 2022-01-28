@@ -1,4 +1,4 @@
-# @cartesian-ui/ng-axis
+# @cartesianui/ng-axis
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
@@ -43,7 +43,7 @@ Issues of this repository are tracked on https://github.com/orendalabs/cartesian
 To install this library, run:
 
 ```bash
-$ npm i @cartesian-ui/ng-axis --save
+$ npm i @cartesianui/ng-axis --save
 ```
 
 ## AxisHttpInterceptor
@@ -51,7 +51,7 @@ $ npm i @cartesian-ui/ng-axis --save
 In order to use AxisHttpInterceptor, first import it into module like below;
 
 ```ts
-import { AxisHttpInterceptor } from '@cartesian-ui/ng-axis';
+import { AxisHttpInterceptor } from '@cartesianui/ng-axis';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 ```
 
@@ -72,7 +72,7 @@ providers: [
 Import any other service e.g. TenancyService
 
 ```ts
-import { TenancyService } from '@cartesian-ui/ng-axis';
+import { TenancyService } from '@cartesianui/ng-axis';
 ```
 
 ## License

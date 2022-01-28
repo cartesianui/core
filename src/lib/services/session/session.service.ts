@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesian-ui/js-axis/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js-axis/axis.d.ts"/>
 
 import {Injectable, Injector} from "@angular/core";
 
