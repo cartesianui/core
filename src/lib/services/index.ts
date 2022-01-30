@@ -6,6 +6,7 @@ export * from "./log/log.service";
 export * from "./message/message.service";
 export * from "./tenancy/tenancy.service";
 export * from "./notify/notify.service";
+export * from "./session/session.service";
 export * from "./settings/setting.service";
 export * from "./utils/utils.service";
 export * from "./utils/ui.service";
