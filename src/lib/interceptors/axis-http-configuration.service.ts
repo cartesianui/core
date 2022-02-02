@@ -10,10 +10,7 @@ import { extractContent } from '../services/utils/helpers';
   providedIn: 'root'
 })
 export class AxisHttpConfigurationService {
-  constructor(
-    private _messageService: MessageService,
-    private _logService: LogService
-  ) {}
+  constructor(private _messageService: MessageService, private _logService: LogService) {}
 
   defaultError = <IErrorInfo>{
     message: 'An error has occurred!',
@@ -22,8 +19,7 @@ export class AxisHttpConfigurationService {
 
   defaultError401 = <IErrorInfo>{
     message: 'You are not authenticated!',
-    details:
-      'You should be authenticated (sign in) in order to perform this operation.'
+    details: 'You should be authenticated (sign in) in order to perform this operation.'
   };
 
   defaultError403 = <IErrorInfo>{
@@ -47,14 +43,9 @@ export class AxisHttpConfigurationService {
 
   showError(error: IErrorInfo): any {
     if (error.details) {
-      return this._messageService.error(
-        error.details,
-        error.message || this.defaultError.message
-      );
+      return this._messageService.error(error.details, error.message || this.defaultError.message);
     } else {
-      return this._messageService.error(
-        error.message || this.defaultError.message
-      );
+      return this._messageService.error(error.message || this.defaultError.message);
     }
   }
 
@@ -83,10 +74,7 @@ export class AxisHttpConfigurationService {
 
     switch (response.status) {
       case 401:
-        self.handleUnAuthorizedRequest(
-          self.showError(self.defaultError401),
-          '/'
-        );
+        self.handleUnAuthorizedRequest(self.showError(self.defaultError401), '/');
         break;
       case 403:
         self.showError(self.defaultError403);
@@ -103,10 +91,7 @@ export class AxisHttpConfigurationService {
     }
   }
 
-  handleAxisResponse(
-    response: HttpResponse<any>,
-    ajaxResponse: IAjaxResponse
-  ): HttpResponse<any> {
+  handleAxisResponse(response: HttpResponse<any>, ajaxResponse: IAjaxResponse): HttpResponse<any> {
     var newResponse: HttpResponse<any>;
 
     if (ajaxResponse.success) {
@@ -149,9 +134,7 @@ export class AxisHttpConfigurationService {
     }
 
     if (contentType.indexOf('application/json') < 0) {
-      this._logService.warn(
-        'Content-Type is not application/json: ' + contentType
-      );
+      this._logService.warn('Content-Type is not application/json: ' + contentType);
       return null;
     }
 

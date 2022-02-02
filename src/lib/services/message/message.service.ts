@@ -22,12 +22,7 @@ export class MessageService {
     return axis.message.error(message, title, options);
   }
 
-  confirm(
-    message: string,
-    title?: string,
-    callback?: (result: boolean) => void,
-    options?: any
-  ): any {
+  confirm(message: string, title?: string, callback?: (result: boolean) => void, options?: any): any {
     return axis.message.confirm(message, title, callback, options);
   }
 }

@@ -10,12 +10,7 @@ export class UtilsService {
     return axis.utils.getCookieValue(key);
   }
 
-  setCookieValue(
-    key: string,
-    value: string,
-    expireDate?: Date,
-    path?: string
-  ): void {
+  setCookieValue(key: string, value: string, expireDate?: Date, path?: string): void {
     axis.utils.setCookieValue(key, value, expireDate, path);
   }
 

@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, throwError as _observableThrow } from 'rxjs';
-import {
-  mergeMap as _observableMergeMap,
-  catchError as _observableCatch
-} from 'rxjs/operators';
+import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
 import { HttpAdapter } from './http.adapter';
 import { AppConstants } from '../../app-constants';
 import { convertObjectKeysToSnake, isObject } from '../../services';
@@ -48,9 +45,7 @@ export class HttpService {
    */
   protected requestInterceptor(requestOptions: any) {
     if (AppConstants.convertRequestObjectKeysToSnake) {
-      requestOptions.body = this.convertRequestBodyObjectKeysToSnake(
-        requestOptions.body
-      );
+      requestOptions.body = this.convertRequestBodyObjectKeysToSnake(requestOptions.body);
     }
 
     return requestOptions;
@@ -63,10 +58,7 @@ export class HttpService {
    * @param {Response} observableRes - response object
    * @returns {Response} res - transformed response object
    */
-  protected responseInterceptor(
-    observableRes: Observable<any>,
-    adapterFn?: Function
-  ): Observable<any> {
+  protected responseInterceptor(observableRes: Observable<any>, adapterFn?: Function): Observable<any> {
     return observableRes
       .pipe(
         _observableMergeMap((response_: any) => {

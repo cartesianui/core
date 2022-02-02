@@ -1,16 +1,5 @@
 import { isString } from '../../services/utils/helpers';
-import {
-  WhereItem,
-  OrderItem,
-  Operator,
-  Value,
-  OrderDirection,
-  Column,
-  ColumnItem,
-  Comparison,
-  Fields,
-  Pairs
-} from './type';
+import { WhereItem, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './type';
 
 export class RequestCriteria<SearchForm> {
   public form: SearchForm;
@@ -27,20 +16,12 @@ export class RequestCriteria<SearchForm> {
     this.form = form;
   }
 
-  where(
-    column: string | Column,
-    operator: Operator | Value = null,
-    value: Value = null
-  ) {
+  where(column: string | Column, operator: Operator | Value = null, value: Value = null) {
     if (Array.isArray(column)) {
       return this.whereArray(column);
     }
 
-    [value, operator] = this.prepareValueAndOperator(
-      value,
-      operator,
-      arguments.length === 2
-    );
+    [value, operator] = this.prepareValueAndOperator(value, operator, arguments.length === 2);
 
     if (!isString(operator)) {
       value = operator;
@@ -126,11 +107,7 @@ export class RequestCriteria<SearchForm> {
     }
   }
 
-  protected prepareValueAndOperator(
-    value: Value,
-    operator: Operator | Value,
-    useDefault = false
-  ) {
+  protected prepareValueAndOperator(value: Value, operator: Operator | Value, useDefault = false) {
     if (useDefault) {
       return [operator, '='];
     }

@@ -6,11 +6,7 @@ import { isObject } from '../../services';
 
 export function methodBuilder(method: string) {
   return function (url: string) {
-    return function (
-      target: HttpService,
-      propertyKey: string,
-      descriptor: any
-    ) {
+    return function (target: HttpService, propertyKey: string, descriptor: any) {
       const pPath = target[`${propertyKey}_Path_parameters`],
         pQuery = target[`${propertyKey}_Query_parameters`],
         pBody = target[`${propertyKey}_Body_parameters`],
@@ -20,12 +16,7 @@ export function methodBuilder(method: string) {
       descriptor.value = function (...args: any[]) {
         const body: string = createBody(pBody, descriptor, args);
         const resUrl: string = createPath(url, pPath, args);
-        const headers: HttpHeaders = createHeaders(
-          pHeader,
-          descriptor,
-          this.getDefaultHeaders(),
-          args
-        );
+        const headers: HttpHeaders = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
         const params: HttpParams | boolean = createCriteria(pCriteria, args);
         const search: HttpParams = createQuery(pQuery, args);
 
@@ -44,11 +35,7 @@ export function methodBuilder(method: string) {
         options = this.requestInterceptor(options);
 
         // make the request and store the observable for later transformation
-        let observable: Observable<HttpResponse<any>> = this.http.request(
-          method,
-          this.getBaseUrl() + resUrl,
-          options
-        );
+        let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options);
 
         // intercept the response
         observable = this.responseInterceptor(observable, descriptor.adapter);
@@ -63,29 +50,20 @@ export function methodBuilder(method: string) {
 
 export function paramBuilder(paramName: string) {
   return function (key: string) {
-    return function (
-      target: HttpService,
-      propertyKey: string | symbol,
-      parameterIndex: number
-    ) {
+    return function (target: HttpService, propertyKey: string | symbol, parameterIndex: number) {
       var metadataKey = `${String(propertyKey)}_${paramName}_parameters`;
       var paramObj: any = {
         key: key,
         parameterIndex: parameterIndex
       };
 
-      if (Array.isArray(target[metadataKey]))
-        target[metadataKey].push(paramObj);
+      if (Array.isArray(target[metadataKey])) target[metadataKey].push(paramObj);
       else target[metadataKey] = [paramObj];
     };
   };
 }
 
-function createBody(
-  pBody: Array<any>,
-  descriptor: any,
-  args: Array<any>
-): string {
+function createBody(pBody: Array<any>, descriptor: any, args: Array<any>): string {
   if (descriptor.isFormData) {
     return args[0];
   } else {
@@ -103,10 +81,7 @@ function createPath(url: string, pPath: Array<any>, args: Array<any>): string {
   if (pPath) {
     for (var k in pPath) {
       if (pPath.hasOwnProperty(k)) {
-        resUrl = resUrl.replace(
-          '{' + pPath[k].key + '}',
-          args[pPath[k].parameterIndex]
-        );
+        resUrl = resUrl.replace('{' + pPath[k].key + '}', args[pPath[k].parameterIndex]);
       }
     }
   }
@@ -126,26 +101,15 @@ function createQuery(pQuery: any, args: Array<any>): HttpParams {
         if (value instanceof Object) {
           value = JSON.stringify(value);
         }
-        params = params.append(
-          encodeURIComponent(key),
-          encodeURIComponent(value)
-        );
+        params = params.append(encodeURIComponent(key), encodeURIComponent(value));
       });
   }
 
   return params;
 }
 
-function createCriteria(
-  pCriteria: RequestCriteria<any>,
-  args: Array<any>
-): HttpParams | boolean {
-  if (
-    pCriteria &&
-    pCriteria[0] &&
-    args[pCriteria[0].parameterIndex] &&
-    args[pCriteria[0].parameterIndex] instanceof RequestCriteria
-  ) {
+function createCriteria(pCriteria: RequestCriteria<any>, args: Array<any>): HttpParams | boolean {
+  if (pCriteria && pCriteria[0] && args[pCriteria[0].parameterIndex] && args[pCriteria[0].parameterIndex] instanceof RequestCriteria) {
     const criteria = args[pCriteria[0].parameterIndex].toString();
     const httpParams = new HttpParams({ fromString: criteria });
     return httpParams;
@@ -154,12 +118,7 @@ function createCriteria(
   return false;
 }
 
-function createHeaders(
-  pHeader: any,
-  descriptor: any,
-  defaultHeaders: any,
-  args: Array<any>
-): HttpHeaders {
+function createHeaders(pHeader: any, descriptor: any, defaultHeaders: any, args: Array<any>): HttpHeaders {
   let httpHeaders = new HttpHeaders(defaultHeaders);
 
   // set method specific headers
