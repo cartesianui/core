@@ -1,14 +1,13 @@
 ﻿///<reference path="../../../../../../node_modules/@cartesianui/js-axis/axis.d.ts"/>
-import { Injectable, Injector } from "@angular/core";
+import { Injectable, Injector } from '@angular/core';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
 export class NotifyService {
-
   private _toasterNotificationService = null;
 
-  constructor( private _injector: Injector ) {
+  constructor(private _injector: Injector) {
     this._toasterNotificationService = axis.notify;
   }
 

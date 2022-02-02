@@ -13,8 +13,7 @@ import {
 } from './type';
 
 export class RequestCriteria<SearchForm> {
-
-  public  form: SearchForm;
+  public form: SearchForm;
   private wheres: WhereItem[] = [];
   private orders: OrderItem[] = [];
   private relations: string[] = [];
@@ -24,12 +23,15 @@ export class RequestCriteria<SearchForm> {
   private searchJoinComparison: Comparison = 'or';
   private operators: string[] = ['=', 'like'];
 
-
   constructor(form: SearchForm) {
     this.form = form;
   }
 
-  where(column: string | Column, operator: Operator | Value = null, value: Value = null) {
+  where(
+    column: string | Column,
+    operator: Operator | Value = null,
+    value: Value = null
+  ) {
     if (Array.isArray(column)) {
       return this.whereArray(column);
     }
@@ -37,7 +39,7 @@ export class RequestCriteria<SearchForm> {
     [value, operator] = this.prepareValueAndOperator(
       value,
       operator,
-      arguments.length === 2,
+      arguments.length === 2
     );
 
     if (!isString(operator)) {
@@ -52,7 +54,7 @@ export class RequestCriteria<SearchForm> {
     this.wheres.push({
       column,
       operator,
-      value,
+      value
     });
 
     return this;
@@ -79,7 +81,7 @@ export class RequestCriteria<SearchForm> {
   orderBy(column: string, direction: OrderDirection = 'asc') {
     this.orders.push({
       column,
-      direction,
+      direction
     });
 
     return this;
@@ -89,13 +91,13 @@ export class RequestCriteria<SearchForm> {
     return this.orderBy(column, 'desc');
   }
 
-  page(page: number){
+  page(page: number) {
     this.pageNo = page;
 
     return this;
   }
 
-  limit(limit: number){
+  limit(limit: number) {
     this.limitPerPage = limit;
 
     return this;
@@ -114,17 +116,21 @@ export class RequestCriteria<SearchForm> {
   }
 
   protected feedWhereFromSearchForm() {
-    if(this.form) {
+    if (this.form) {
       for (const field in this.form) {
         const data = this.form[field];
-        if(data['value']){
-          this.where(data['column'], data['operator'], data['value'])
+        if (data['value']) {
+          this.where(data['column'], data['operator'], data['value']);
         }
       }
     }
   }
 
-  protected prepareValueAndOperator(value: Value, operator: Operator | Value, useDefault = false) {
+  protected prepareValueAndOperator(
+    value: Value,
+    operator: Operator | Value,
+    useDefault = false
+  ) {
     if (useDefault) {
       return [operator, '='];
     }

@@ -1,9 +1,9 @@
-﻿import { Injectable, Injector } from "@angular/core";
-import { Observable, of, BehaviorSubject } from "rxjs";
-import { LogService } from "../services/log/log.service";
-import { TokenService } from "../services/auth/token.service";
-import { UtilsService } from "../services/utils/utils.service";
-import { AppConstants } from "../app-constants";
+﻿import { Injectable, Injector } from '@angular/core';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { LogService } from '../services/log/log.service';
+import { TokenService } from '../services/auth/token.service';
+import { UtilsService } from '../services/utils/utils.service';
+import { AppConstants } from '../app-constants';
 import {
   HttpInterceptor,
   HttpHandler,
@@ -11,12 +11,12 @@ import {
   HttpEvent,
   HttpResponse,
   HttpErrorResponse,
-  HttpHeaders,
-} from "@angular/common/http";
-import { switchMap, filter, take, catchError, tap, map } from "rxjs/operators";
-import { throwError } from "rxjs";
-import { AxisHttpConfigurationService } from "./axis-http-configuration.service";
-import { RefreshTokenService } from "./refresh-token.service";
+  HttpHeaders
+} from '@angular/common/http';
+import { switchMap, filter, take, catchError, tap, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { AxisHttpConfigurationService } from './axis-http-configuration.service';
+import { RefreshTokenService } from './refresh-token.service';
 
 declare const axis: any;
 
@@ -34,7 +34,10 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     this.configuration = configuration;
   }
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     var modifiedRequest = this.normalizeRequestHeaders(request);
     return next.handle(modifiedRequest).pipe(
       catchError((error) => {
@@ -60,9 +63,15 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
+    null
+  );
 
-  private tryAuthWithRefreshToken(request: HttpRequest<any>, next: HttpHandler, error: any) {
+  private tryAuthWithRefreshToken(
+    request: HttpRequest<any>,
+    next: HttpHandler,
+    error: any
+  ) {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
@@ -91,12 +100,14 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     }
   }
 
-  protected normalizeRequestHeaders(request: HttpRequest<any>): HttpRequest<any> {
+  protected normalizeRequestHeaders(
+    request: HttpRequest<any>
+  ): HttpRequest<any> {
     var modifiedHeaders = new HttpHeaders();
     modifiedHeaders = request.headers
-      .set("Pragma", "no-cache")
-      .set("Cache-Control", "no-cache")
-      .set("Expires", "Sat, 01 Jan 2000 00:00:00 GMT");
+      .set('Pragma', 'no-cache')
+      .set('Cache-Control', 'no-cache')
+      .set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 
     modifiedHeaders = this.addXRequestedWithHeader(modifiedHeaders);
     modifiedHeaders = this.addAuthorizationHeaders(modifiedHeaders);
@@ -106,13 +117,13 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
 
     return request.clone({
-      headers: modifiedHeaders,
+      headers: modifiedHeaders
     });
   }
 
   protected addXRequestedWithHeader(headers: HttpHeaders): HttpHeaders {
     if (headers) {
-      headers = headers.set("X-Requested-With", "XMLHttpRequest");
+      headers = headers.set('X-Requested-With', 'XMLHttpRequest');
     }
 
     return headers;
@@ -120,10 +131,10 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
   protected addAspNetCoreCultureHeader(headers: HttpHeaders): HttpHeaders {
     let cookieLangValue = this._utilsService.getCookieValue(
-      "Axis.Localization.CultureName"
+      'Axis.Localization.CultureName'
     );
-    if (cookieLangValue && headers && !headers.has(".AspNetCore.Culture")) {
-      headers = headers.set(".AspNetCore.Culture", cookieLangValue);
+    if (cookieLangValue && headers && !headers.has('.AspNetCore.Culture')) {
+      headers = headers.set('.AspNetCore.Culture', cookieLangValue);
     }
 
     return headers;
@@ -131,10 +142,10 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
   protected addAcceptLanguageHeader(headers: HttpHeaders): HttpHeaders {
     let cookieLangValue = this._utilsService.getCookieValue(
-      "Axis.Localization.CultureName"
+      'Axis.Localization.CultureName'
     );
-    if (cookieLangValue && headers && !headers.has("Accept-Language")) {
-      headers = headers.set("Accept-Language", cookieLangValue);
+    if (cookieLangValue && headers && !headers.has('Accept-Language')) {
+      headers = headers.set('Accept-Language', cookieLangValue);
     }
 
     return headers;
@@ -164,9 +175,9 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
       if (tenancy !== undefined && tenancy.overwriteHeaderAttribute) {
-        headers = headers.set( headerAttribute, tenancy.host);
+        headers = headers.set(headerAttribute, tenancy.host);
       } else {
-        headers = headers.set( headerAttribute, this.getHostName());
+        headers = headers.set(headerAttribute, this.getHostName());
       }
     }
 
@@ -174,7 +185,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addAuthorizationHeaders(headers: HttpHeaders): HttpHeaders {
-    let authorizationHeaders = headers ? headers.getAll("Authorization") : null;
+    let authorizationHeaders = headers ? headers.getAll('Authorization') : null;
     if (!authorizationHeaders) {
       authorizationHeaders = [];
     }
@@ -182,41 +193,43 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     if (
       !this.itemExists(
         authorizationHeaders,
-        (item: string) => item.indexOf("Bearer ") == 0
+        (item: string) => item.indexOf('Bearer ') == 0
       )
     ) {
       let token = this._tokenService.getToken();
       if (headers && token) {
-        headers = headers.set("Authorization", "Bearer " + token);
+        headers = headers.set('Authorization', 'Bearer ' + token);
       }
     }
 
     return headers;
   }
 
-  protected handleSuccessResponse(event: HttpEvent<any>): Observable<HttpEvent<any>> {
+  protected handleSuccessResponse(
+    event: HttpEvent<any>
+  ): Observable<HttpEvent<any>> {
     var self = this;
 
     if (event instanceof HttpResponse) {
       if (
         event.body instanceof Blob &&
         event.body.type &&
-        event.body.type.indexOf("application/json") >= 0
+        event.body.type.indexOf('application/json') >= 0
       ) {
         return self.configuration.extractContent(event.body).pipe(
           map((json) => {
-            const responseBody = json == "null" ? {} : JSON.parse(json);
+            const responseBody = json == 'null' ? {} : JSON.parse(json);
 
             var modifiedResponse = self.configuration.handleResponse(
               event.clone({
-                body: responseBody,
+                body: responseBody
               })
             );
 
             return modifiedResponse.clone({
               body: new Blob([JSON.stringify(modifiedResponse.body)], {
-                type: "application/json",
-              }),
+                type: 'application/json'
+              })
             });
           })
         );
@@ -226,17 +239,17 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleErrorResponse(error: any): Observable<never> {
-
     return this.configuration.extractContent(error.error).pipe(
       switchMap((json) => {
-        const errorBody = json == "" || json == "null" ? {} : JSON.parse(json);
+        const errorBody = json == '' || json == 'null' ? {} : JSON.parse(json);
         const errorResponse = new HttpResponse({
           headers: error.headers,
           status: error.status,
           body: errorBody
         });
 
-        var ajaxResponse = this.configuration.getAxisAjaxResponseOrNull(errorResponse);
+        var ajaxResponse =
+          this.configuration.getAxisAjaxResponseOrNull(errorResponse);
 
         if (ajaxResponse != null) {
           this.configuration.handleAxisResponse(errorResponse, ajaxResponse);
@@ -261,8 +274,6 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
   private getHostName(): string {
     const port = document.location.port ? ':' + document.location.port : '';
-    return (
-      document.location.hostname + port
-    );
+    return document.location.hostname + port;
   }
 }

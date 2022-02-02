@@ -1,11 +1,5 @@
-import {
-  HttpService,
-  MediaType
-}                        from './http.service';
-import {
-  methodBuilder,
-  paramBuilder
-}                        from './utils.service';
+import { HttpService, MediaType } from './http.service';
+import { methodBuilder, paramBuilder } from './utils.service';
 
 /* *********************************************
  * Class decorators
@@ -33,7 +27,6 @@ export function DefaultHeaders(headers: any) {
   };
 }
 
-
 /* *********************************************
  * Method decorators
  * *********************************************/
@@ -42,39 +35,39 @@ export function DefaultHeaders(headers: any) {
  * GET method
  * @param {string} url - resource url of the method
  */
-export var GET = methodBuilder("GET");
+export var GET = methodBuilder('GET');
 /**
  * POST method
  * @param {string} url - resource url of the method
  */
-export var POST = methodBuilder("POST");
+export var POST = methodBuilder('POST');
 /**
  * PUT method
  * @param {string} url - resource url of the method
  */
-export var PUT = methodBuilder("PUT");
+export var PUT = methodBuilder('PUT');
 /**
  * PATCH method
  * @param {string} url - resource url of the method
  */
-export var PATCH = methodBuilder("PATCH");
+export var PATCH = methodBuilder('PATCH');
 /**
  * DELETE method
  * @param {string} url - resource url of the method
  */
-export var DELETE = methodBuilder("DELETE");
+export var DELETE = methodBuilder('DELETE');
 /**
  * HEAD method
  * @param {string} url - resource url of the method
  */
-export var HEAD = methodBuilder("HEAD");
+export var HEAD = methodBuilder('HEAD');
 
 /**
  * Set custom headers for a REST method
  * @param {Object} headersDef - custom headers in a key-value pair
  */
 export function Headers(headersDef: any) {
-  return function(target: HttpService, propertyKey: string, descriptor: any) {
+  return function (target: HttpService, propertyKey: string, descriptor: any) {
     descriptor.headers = headersDef;
     return descriptor;
   };
@@ -85,8 +78,8 @@ export function Headers(headersDef: any) {
  * @param MediaType producesDef - MediaType to be sent
  */
 export function Produces(producesDef: MediaType) {
-  return function(target: HttpService, propertyKey: string, descriptor: any) {
-    descriptor.isJSON     = producesDef === MediaType.JSON;
+  return function (target: HttpService, propertyKey: string, descriptor: any) {
+    descriptor.isJSON = producesDef === MediaType.JSON;
     descriptor.isFormData = producesDef === MediaType.FORM_DATA;
     return descriptor;
   };
@@ -97,12 +90,11 @@ export function Produces(producesDef: MediaType) {
  * @param TFunction adapterFn - function to be called
  */
 export function Adapter(adapterFn: Function) {
-  return function(target: HttpService, propertyKey: string, descriptor: any) {
+  return function (target: HttpService, propertyKey: string, descriptor: any) {
     descriptor.adapter = adapterFn || null;
     return descriptor;
   };
 }
-
 
 /* *********************************************
  * Parameter decorators
@@ -112,24 +104,24 @@ export function Adapter(adapterFn: Function) {
  * Path variable of a method's url, type: string
  * @param {string} key - path key to bind value
  */
-export var Path = paramBuilder("Path");
+export var Path = paramBuilder('Path');
 /**
  * Query value of a method's url, type: string
  * @param {string} key - query key to bind value
  */
-export var Query = paramBuilder("Query");
+export var Query = paramBuilder('Query');
 /**
  * Request Criteria of a REST method, type: key-value pair object
  * Only one criteria per method!
  */
-export var Criteria = paramBuilder("Criteria")("Criteria");
+export var Criteria = paramBuilder('Criteria')('Criteria');
 /**
  * Body of a REST method, type: key-value pair object
  * Only one body per method!
  */
-export var Body = paramBuilder("Body")("Body");
+export var Body = paramBuilder('Body')('Body');
 /**
  * Custom header of a REST method, type: string
  * @param {string} key - header key to bind value
  */
-export var Header = paramBuilder("Header");
+export var Header = paramBuilder('Header');

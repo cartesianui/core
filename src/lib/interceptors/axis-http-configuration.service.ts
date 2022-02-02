@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { MessageService } from "../services/message/message.service";
-import { LogService } from "../services/log/log.service";
-import { HttpResponse } from "@angular/common/http";
-import { IErrorInfo, IAjaxResponse } from "../models";
-import { extractContent } from "../services/utils/helpers";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { MessageService } from '../services/message/message.service';
+import { LogService } from '../services/log/log.service';
+import { HttpResponse } from '@angular/common/http';
+import { IErrorInfo, IAjaxResponse } from '../models';
+import { extractContent } from '../services/utils/helpers';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
 export class AxisHttpConfigurationService {
   constructor(
@@ -16,29 +16,29 @@ export class AxisHttpConfigurationService {
   ) {}
 
   defaultError = <IErrorInfo>{
-    message: "An error has occurred!",
-    details: "Error details were not sent by server.",
+    message: 'An error has occurred!',
+    details: 'Error details were not sent by server.'
   };
 
   defaultError401 = <IErrorInfo>{
-    message: "You are not authenticated!",
+    message: 'You are not authenticated!',
     details:
-      "You should be authenticated (sign in) in order to perform this operation.",
+      'You should be authenticated (sign in) in order to perform this operation.'
   };
 
   defaultError403 = <IErrorInfo>{
-    message: "You are not authorized!",
-    details: "You are not allowed to perform this operation.",
+    message: 'You are not authorized!',
+    details: 'You are not allowed to perform this operation.'
   };
 
   defaultError404 = <IErrorInfo>{
-    message: "Resource not found!",
-    details: "The resource requested could not be found on the server.",
+    message: 'Resource not found!',
+    details: 'The resource requested could not be found on the server.'
   };
 
   defaultError504 = <IErrorInfo>{
-    message: "Gateway Timeout!",
-    details: "Server is not responding, try again after sometime.",
+    message: 'Gateway Timeout!',
+    details: 'Server is not responding, try again after sometime.'
   };
 
   logError(error: IErrorInfo): void {
@@ -71,10 +71,10 @@ export class AxisHttpConfigurationService {
 
     if (messagePromise) {
       messagePromise.done(() => {
-        this.handleTargetUrl(targetUrl || "/");
+        this.handleTargetUrl(targetUrl || '/');
       });
     } else {
-      self.handleTargetUrl(targetUrl || "/");
+      self.handleTargetUrl(targetUrl || '/');
     }
   }
 
@@ -85,7 +85,7 @@ export class AxisHttpConfigurationService {
       case 401:
         self.handleUnAuthorizedRequest(
           self.showError(self.defaultError401),
-          "/"
+          '/'
         );
         break;
       case 403:
@@ -103,12 +103,15 @@ export class AxisHttpConfigurationService {
     }
   }
 
-  handleAxisResponse(response: HttpResponse<any>, ajaxResponse: IAjaxResponse): HttpResponse<any> {
+  handleAxisResponse(
+    response: HttpResponse<any>,
+    ajaxResponse: IAjaxResponse
+  ): HttpResponse<any> {
     var newResponse: HttpResponse<any>;
 
     if (ajaxResponse.success) {
       newResponse = response.clone({
-        body: ajaxResponse.result,
+        body: ajaxResponse.result
       });
 
       if (ajaxResponse.targetUrl) {
@@ -116,7 +119,7 @@ export class AxisHttpConfigurationService {
       }
     } else {
       newResponse = response.clone({
-        body: ajaxResponse.result,
+        body: ajaxResponse.result
       });
 
       if (!ajaxResponse.error) {
@@ -139,15 +142,15 @@ export class AxisHttpConfigurationService {
       return null;
     }
 
-    var contentType = response.headers.get("Content-Type");
+    var contentType = response.headers.get('Content-Type');
     if (!contentType) {
-      this._logService.warn("Content-Type is not sent!");
+      this._logService.warn('Content-Type is not sent!');
       return null;
     }
 
-    if (contentType.indexOf("application/json") < 0) {
+    if (contentType.indexOf('application/json') < 0) {
       this._logService.warn(
-        "Content-Type is not application/json: " + contentType
+        'Content-Type is not application/json: ' + contentType
       );
       return null;
     }

@@ -1,8 +1,8 @@
-import { NgModule } from "@angular/core";
+import { NgModule } from '@angular/core';
 
 @NgModule({
   declarations: [],
   imports: [],
-  exports: [],
+  exports: []
 })
 export class AxisModule {}

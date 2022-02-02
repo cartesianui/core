@@ -1,15 +1,14 @@
 ﻿///<reference path="../../../../../../node_modules/@cartesianui/js-axis/axis.d.ts"/>
 
-import {Injectable, Injector} from "@angular/core";
+import { Injectable, Injector } from '@angular/core';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
 export class SessionService {
-
   private _session = null;
 
-  constructor( private _injector: Injector ) {
+  constructor(private _injector: Injector) {
     this._session = axis.session;
   }
 
@@ -32,5 +31,4 @@ export class SessionService {
   get isUserLogged(): boolean {
     return this._session.isUserLogged();
   }
-
 }
