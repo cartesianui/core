@@ -1,5 +1,5 @@
 {
-  "name": "@cartesianui/ng-axis",
+  "name": "@cartesianui/core",
   "version": "1.0.0",
   "peerDependencies": {
     "@angular/common": "^12.2.0",

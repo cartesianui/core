@@ -1,9 +1,9 @@
 /*
- * Public API Surface of ng-axis
+ * Public API Surface of core
  */
 
 export * from './app-constants';
-export * from './axis.module';
+export * from './core.module';
 export * from './services';
 export * from './interceptors';
 export * from './models';

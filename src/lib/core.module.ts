@@ -5,4 +5,4 @@ import { NgModule } from '@angular/core';
   imports: [],
   exports: []
 })
-export class AxisModule {}
+export class CoreModule {}

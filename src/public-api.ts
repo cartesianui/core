@@ -1,5 +1,5 @@
 /*
- * Public API Surface of ng-axis
+ * Public API Surface of core
  */
 
 export * from './lib';

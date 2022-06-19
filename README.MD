@@ -1,16 +1,16 @@
-# @cartesianui/ng-axis
+# @cartesianui/core
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
 ## Code scaffolding
 
-Run `ng generate component component-name --project ng-axis` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ng-axis`.
+Run `ng generate component component-name --project core` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project core`.
 
-> Note: Don't forget to add `--project ng-axis` or else it will be added to the default project in your `angular.json` file.
+> Note: Don't forget to add `--project core` or else it will be added to the default project in your `angular.json` file.
 
 ## Build
 
-Run `ng build ng-axis` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `ng build core` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ## Development/Build
 
@@ -22,11 +22,11 @@ $ npm run build:prod
 
 ## Publishing
 
-After building your library, go to the dist folder `cd dist/ng-axis` and run `npm publish` or run below command
+After building your library, go to the dist folder `cd dist/core` and run `npm publish` or run below command
 
 ## Running unit tests
 
-Run `ng test ng-axis` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `ng test core` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
 ## Further help
 
@@ -43,7 +43,7 @@ Issues of this repository are tracked on https://github.com/orendalabs/cartesian
 To install this library, run:
 
 ```bash
-$ npm i @cartesianui/ng-axis --save
+$ npm i @cartesianui/core --save
 ```
 
 ## AxisHttpInterceptor
@@ -51,7 +51,7 @@ $ npm i @cartesianui/ng-axis --save
 In order to use AxisHttpInterceptor, first import it into module like below;
 
 ```ts
-import { AxisHttpInterceptor } from '@cartesianui/ng-axis';
+import { AxisHttpInterceptor } from '@cartesianui/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 ```
 
@@ -72,7 +72,7 @@ providers: [
 Import any other service e.g. TenancyService
 
 ```ts
-import { TenancyService } from '@cartesianui/ng-axis';
+import { TenancyService } from '@cartesianui/core';
 ```
 
 ## License

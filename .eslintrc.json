@@ -5,7 +5,7 @@
     {
       "files": ["*.ts"],
       "parserOptions": {
-        "project": ["projects/ng-axis/tsconfig.lib.json", "projects/ng-axis/tsconfig.spec.json"],
+        "project": ["projects/core/tsconfig.lib.json", "projects/core/tsconfig.spec.json"],
         "createDefaultProgram": true
       },
       "rules": {
