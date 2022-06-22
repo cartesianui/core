@@ -36,7 +36,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 # Important
 
-Issues of this repository are tracked on https://github.com/orendalabs/cartesian.ui. Please create your issues on https://github.com/orendalabs/cartesian.ui/issues.
+Issues of this repository are tracked on https://github.com/cartesianui/back-office-app. Please create your issues on https://github.com/cartesianui/back-office-app/issues.
 
 ## Installation
 
