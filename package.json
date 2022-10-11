@@ -1,6 +1,6 @@
 {
   "name": "@cartesianui/core",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "peerDependencies": {
     "@angular/common": "~14.0.4",
     "@angular/core": "~14.0.4",
