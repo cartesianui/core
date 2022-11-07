@@ -1,26 +1,21 @@
-﻿import { Injectable, Injector } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { LogService } from '../services/log/log.service';
-import { TokenService } from '../services/auth/token.service';
-import { UtilsService } from '../services/utils/utils.service';
-import { AppConstants } from '../app-constants';
+import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { switchMap, filter, take, catchError, tap, map } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { AxisHttpConfigurationService } from './axis-http-configuration.service';
-import { RefreshTokenService } from './refresh-token.service';
+import { Observable, of, BehaviorSubject, throwError} from 'rxjs';
+import { switchMap, filter, take, catchError, map } from 'rxjs/operators';
+import { AppConstants } from '../../app-constants';
+import { TokenService, RefreshTokenService, UtilsService } from '../../services';
+import { HttpResponseService } from './http-response.service';
 
 declare const axis: any;
 
 @Injectable()
 export class AxisHttpInterceptor implements HttpInterceptor {
-  protected configuration: AxisHttpConfigurationService;
+  private _httpResponseService: HttpResponseService;
   private _tokenService: TokenService = new TokenService();
   private _utilsService: UtilsService = new UtilsService();
-  private _logService: LogService = new LogService();
 
-  constructor(configuration: AxisHttpConfigurationService, private _injector: Injector) {
-    this.configuration = configuration;
+  constructor(responseService: HttpResponseService, private _injector: Injector) {
+    this._httpResponseService = responseService;
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -86,7 +81,6 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
     modifiedHeaders = this.addXRequestedWithHeader(modifiedHeaders);
     modifiedHeaders = this.addAuthorizationHeaders(modifiedHeaders);
-    modifiedHeaders = this.addAspNetCoreCultureHeader(modifiedHeaders);
     modifiedHeaders = this.addAcceptLanguageHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantIdHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
@@ -99,15 +93,6 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   protected addXRequestedWithHeader(headers: HttpHeaders): HttpHeaders {
     if (headers) {
       headers = headers.set('X-Requested-With', 'XMLHttpRequest');
-    }
-
-    return headers;
-  }
-
-  protected addAspNetCoreCultureHeader(headers: HttpHeaders): HttpHeaders {
-    let cookieLangValue = this._utilsService.getCookieValue('Axis.Localization.CultureName');
-    if (cookieLangValue && headers && !headers.has('.AspNetCore.Culture')) {
-      headers = headers.set('.AspNetCore.Culture', cookieLangValue);
     }
 
     return headers;
@@ -133,11 +118,11 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
     let headerAttribute = axis.tenancy.headerAttribute;
-    let tenancy = AppConstants.tenancy;
+    let tenancyConfiguration = AppConstants.interceptor.tenancy;
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
-      if (tenancy !== undefined && tenancy.overwriteHeaderAttribute) {
-        headers = headers.set(headerAttribute, tenancy.host);
+      if (tenancyConfiguration !== undefined && tenancyConfiguration.overwriteHeaderAttribute) {
+        headers = headers.set(headerAttribute, tenancyConfiguration.host);
       } else {
         headers = headers.set(headerAttribute, this.getHostName());
       }
@@ -167,11 +152,11 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
     if (event instanceof HttpResponse) {
       if (event.body instanceof Blob && event.body.type && event.body.type.indexOf('application/json') >= 0) {
-        return self.configuration.extractContent(event.body).pipe(
+        return self._httpResponseService.extractContent(event.body).pipe(
           map((json) => {
             const responseBody = json == 'null' ? {} : JSON.parse(json);
 
-            var modifiedResponse = self.configuration.handleResponse(
+            var modifiedResponse = self._httpResponseService.handleResponse(
               event.clone({
                 body: responseBody
               })
@@ -190,7 +175,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleErrorResponse(error: any): Observable<never> {
-    return this.configuration.extractContent(error.error).pipe(
+    return this._httpResponseService.extractContent(error.error).pipe(
       switchMap((json) => {
         const errorBody = json == '' || json == 'null' ? {} : JSON.parse(json);
         const errorResponse = new HttpResponse({
@@ -199,12 +184,12 @@ export class AxisHttpInterceptor implements HttpInterceptor {
           body: errorBody
         });
 
-        var ajaxResponse = this.configuration.getAxisAjaxResponseOrNull(errorResponse);
+        var axisResponse = this._httpResponseService.getAxisResponseOrNull(errorResponse);
 
-        if (ajaxResponse != null) {
-          this.configuration.handleAxisResponse(errorResponse, ajaxResponse);
+        if (axisResponse != null) {
+          this._httpResponseService.handleAxisResponse(errorResponse, axisResponse);
         } else {
-          this.configuration.handleNonAxisErrorResponse(errorResponse);
+          this._httpResponseService.handleNonAxisErrorResponse(errorResponse);
         }
 
         return throwError(error);

@@ -18,7 +18,7 @@ export function methodBuilder(method: string) {
         const resUrl: string = createPath(url, pPath, args);
         const headers: HttpHeaders = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
         const params: HttpParams | boolean = createCriteria(pCriteria, args);
-        const search: HttpParams = createQuery(pQuery, args);
+        const query: HttpParams = createQuery(pQuery, args);
 
         let options: any = {
           body: body,
@@ -29,6 +29,10 @@ export function methodBuilder(method: string) {
 
         if (params && params instanceof HttpParams) {
           options.params = params;
+        }
+
+        if (query && query instanceof HttpParams) {
+          options.params = options.params ? options.params.concat(`&${query}`) : query;
         }
 
         // intercept the request

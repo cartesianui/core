@@ -1,14 +1,39 @@
 import { Injectable } from '@angular/core';
+import { IANAZone } from 'luxon';
+
+
+type IInterceptorConfig = {
+  error: {
+    show: Boolean;
+    presenter: 'message' | 'notify';
+  };
+  tenancy: {
+    overwriteHeaderAttribute: Boolean;
+    host: string | string[];
+  };
+}
 
 @Injectable()
 export class AppConstants {
-  static remoteServiceBaseUrl: string = '';
 
-  static appBaseUrl: string = '';
+  static remoteServiceBaseUrl = '';
 
-  static appBaseHref: string = ''; // returns angular's base-href parameter value if used during the publish
+  static appBaseUrl = '';
 
-  static localeMappings: any = [];
+  static appBaseHref = ''; // returns angular's base-href parameter value if used during the publish
+
+  static localeMappings = [];
+
+  static interceptor: IInterceptorConfig = {
+    error: {
+      show: true,
+      presenter: 'notify'
+    },
+    tenancy: {
+      overwriteHeaderAttribute: false,
+      host: ''
+    }
+  };
 
   static readonly userManagement = {
     defaultAdminUserName: 'admin'
@@ -22,12 +47,7 @@ export class AppConstants {
     encryptedAuthTokenName: '' // enc_auth_token
   };
 
-  static tenancy = {
-    overwriteHeaderAttribute: false,
-    host: ''
-  };
-
-  static defaultHttpSuccessCodes: any = {
+  static defaultHttpSuccessCodes = {
     '100': { code: 100, message: 'Continue' },
     '101': { code: 101, message: 'Switching Protocols' },
     '102': { code: 102, message: 'Processing' },
@@ -50,7 +70,7 @@ export class AppConstants {
     '307': { code: 307, message: 'Temporary Redirect' }
   };
 
-  static defaultHttpErrorCodes: any = {
+  static defaultHttpErrorCodes = {
     '400': { code: 400, message: 'Bad Request' },
     '401': { code: 401, message: 'Unauthorized' },
     '402': { code: 402, message: 'Payment Required' },
@@ -91,7 +111,7 @@ export class AppConstants {
     '511': { code: 511, message: 'Network Authentication Required' }
   };
 
-  static convertResponseObjectKeysToCamel: boolean = true;
+  static convertResponseObjectKeysToCamel = true;
 
-  static convertRequestObjectKeysToSnake: boolean = true;
+  static convertRequestObjectKeysToSnake = true;
 }

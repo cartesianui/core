@@ -84,7 +84,7 @@ function toCamel(s) {
  */
 function toSnake(s) {
   return s.replace(/[A-Z]/g, (letter) => {
-    return `_${letter.toLowerCase()}`;
+    return `_${letter?.toLowerCase()}`;
   });
 }
 
@@ -145,7 +145,7 @@ export function capitalize(s: string) {
  */
 export function uncapitalize(s: string) {
   if (!s || typeof s !== 'string') return s;
-  return s && s[0].toLowerCase() + s.slice(1);
+  return s && s[0]?.toLowerCase() + s.slice(1);
 }
 
 /**

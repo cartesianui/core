@@ -1,16 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { MessageService } from '../services/message/message.service';
-import { LogService } from '../services/log/log.service';
 import { HttpResponse } from '@angular/common/http';
-import { IErrorInfo, IAjaxResponse } from '../models';
-import { extractContent } from '../services/utils/helpers';
+import { Observable } from 'rxjs';
+import { AppConstants } from '../../app-constants';
+import { MessageService, NotifyService, LogService, extractContent } from '../../services';
+import { IErrorInfo, IAxisResponse } from '../../models';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class AxisHttpConfigurationService {
-  constructor(private _messageService: MessageService, private _logService: LogService) {}
+export class HttpResponseService {
+  constructor(private _messageService: MessageService, private _notifySertvice: NotifyService, private _logService: LogService) {
+    this._notifier = AppConstants.interceptor.error.presenter === 'message' 
+                            ? _messageService 
+                            : _notifySertvice;
+  }
+
+  _notifier: MessageService | NotifyService;
 
   defaultError = <IErrorInfo>{
     message: 'An error has occurred!',
@@ -43,29 +49,29 @@ export class AxisHttpConfigurationService {
 
   showError(error: IErrorInfo): any {
     if (error.details) {
-      return this._messageService.error(error.details, error.message || this.defaultError.message);
+      return this._notifier.error(error.details, error.message || this.defaultError.message);
     } else {
-      return this._messageService.error(error.message || this.defaultError.message);
+      return this._notifier.error(error.message || this.defaultError.message);
     }
   }
 
-  handleTargetUrl(targetUrl: string): void {
-    if (!targetUrl) {
+  redirect(redirectUrl: string): void {
+    if (!redirectUrl) {
       // location.href = "/";
     } else {
-      // location.href = targetUrl;
+      // location.href = redirectUrl;
     }
   }
 
-  handleUnAuthorizedRequest(messagePromise: any, targetUrl?: string) {
+  handleUnAuthorizedResponse(messagePromise: any, redirectUrl?: string) {
     const self = this;
 
     if (messagePromise) {
       messagePromise.done(() => {
-        this.handleTargetUrl(targetUrl || '/');
+        this.redirect(redirectUrl || '/');
       });
     } else {
-      self.handleTargetUrl(targetUrl || '/');
+      self.redirect(redirectUrl || '/');
     }
   }
 
@@ -74,7 +80,7 @@ export class AxisHttpConfigurationService {
 
     switch (response.status) {
       case 401:
-        self.handleUnAuthorizedRequest(self.showError(self.defaultError401), '/');
+        self.handleUnAuthorizedResponse(self.showError(self.defaultError401), '/');
         break;
       case 403:
         self.showError(self.defaultError403);
@@ -91,38 +97,38 @@ export class AxisHttpConfigurationService {
     }
   }
 
-  handleAxisResponse(response: HttpResponse<any>, ajaxResponse: IAjaxResponse): HttpResponse<any> {
-    var newResponse: HttpResponse<any>;
+  handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
+    var cloneResponse: HttpResponse<any>;
 
-    if (ajaxResponse.success) {
-      newResponse = response.clone({
-        body: ajaxResponse.result
+    if (axisResponse.success) {
+      cloneResponse = response.clone({
+        body: axisResponse.result
       });
 
-      if (ajaxResponse.targetUrl) {
-        this.handleTargetUrl(ajaxResponse.targetUrl);
+      if (axisResponse.redirectUrl) {
+        this.redirect(axisResponse.redirectUrl);
       }
     } else {
-      newResponse = response.clone({
-        body: ajaxResponse.result
+      cloneResponse = response.clone({
+        body: axisResponse.result
       });
 
-      if (!ajaxResponse.error) {
-        ajaxResponse.error = this.defaultError;
+      if (!axisResponse.error) {
+        axisResponse.error = this.defaultError;
       }
 
-      this.logError(ajaxResponse.error);
-      this.showError(ajaxResponse.error);
+      this.logError(axisResponse.error);
+      this.showError(axisResponse.error);
 
       if (response.status === 401) {
-        this.handleUnAuthorizedRequest(null, ajaxResponse.targetUrl);
+        this.handleUnAuthorizedResponse(null, axisResponse.redirectUrl);
       }
     }
 
-    return newResponse;
+    return cloneResponse;
   }
 
-  getAxisAjaxResponseOrNull(response: HttpResponse<any>): IAjaxResponse | null {
+  getAxisResponseOrNull(response: HttpResponse<any>): IAxisResponse | null {
     if (!response || !response.headers) {
       return null;
     }
@@ -143,16 +149,16 @@ export class AxisHttpConfigurationService {
       return null;
     }
 
-    return responseObj as IAjaxResponse;
+    return responseObj as IAxisResponse;
   }
 
   handleResponse(response: HttpResponse<any>): HttpResponse<any> {
-    var ajaxResponse = this.getAxisAjaxResponseOrNull(response);
-    if (ajaxResponse == null) {
+    var axisResponse = this.getAxisResponseOrNull(response);
+    if (axisResponse == null) {
       return response;
     }
 
-    return this.handleAxisResponse(response, ajaxResponse);
+    return this.handleAxisResponse(response, axisResponse);
   }
 
   extractContent(content: any): Observable<string> {
