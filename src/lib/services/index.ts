@@ -1,4 +1,5 @@
 export * from './auth/token.service';
+export * from './auth/refresh-token.service'
 export * from './auth/permission-checker.service';
 export * from './features/feature-checker.service';
 export * from './localization/localization.service';

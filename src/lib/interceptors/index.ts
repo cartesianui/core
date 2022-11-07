@@ -1,3 +1,3 @@
 export * from './axis-http-interceptor';
-export * from './axis-http-configuration.service';
+export * from './response-handler.service';
 export * from './refresh-token.service';

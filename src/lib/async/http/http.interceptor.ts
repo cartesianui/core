@@ -1,23 +1,21 @@
-﻿import { Injectable, Injector } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, throwError} from 'rxjs';
 import { switchMap, filter, take, catchError, map } from 'rxjs/operators';
-import { AppConstants } from '../app-constants';
-import { TokenService } from '../services/auth/token.service';
-import { RefreshTokenService } from './refresh-token.service';
-import { UtilsService } from '../services/utils/utils.service';
-import { ResponseService } from './response.service';
+import { AppConstants } from '../../app-constants';
+import { TokenService, RefreshTokenService, UtilsService } from '../../services';
+import { HttpResponseService } from './http-response.service';
 
 declare const axis: any;
 
 @Injectable()
 export class AxisHttpInterceptor implements HttpInterceptor {
-  private _responseService: ResponseService;
+  private _httpResponseService: HttpResponseService;
   private _tokenService: TokenService = new TokenService();
   private _utilsService: UtilsService = new UtilsService();
 
-  constructor(responseService: ResponseService, private _injector: Injector) {
-    this._responseService = responseService;
+  constructor(responseService: HttpResponseService, private _injector: Injector) {
+    this._httpResponseService = responseService;
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -154,11 +152,11 @@ export class AxisHttpInterceptor implements HttpInterceptor {
 
     if (event instanceof HttpResponse) {
       if (event.body instanceof Blob && event.body.type && event.body.type.indexOf('application/json') >= 0) {
-        return self._responseService.extractContent(event.body).pipe(
+        return self._httpResponseService.extractContent(event.body).pipe(
           map((json) => {
             const responseBody = json == 'null' ? {} : JSON.parse(json);
 
-            var modifiedResponse = self._responseService.handleResponse(
+            var modifiedResponse = self._httpResponseService.handleResponse(
               event.clone({
                 body: responseBody
               })
@@ -177,7 +175,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleErrorResponse(error: any): Observable<never> {
-    return this._responseService.extractContent(error.error).pipe(
+    return this._httpResponseService.extractContent(error.error).pipe(
       switchMap((json) => {
         const errorBody = json == '' || json == 'null' ? {} : JSON.parse(json);
         const errorResponse = new HttpResponse({
@@ -186,12 +184,12 @@ export class AxisHttpInterceptor implements HttpInterceptor {
           body: errorBody
         });
 
-        var axisResponse = this._responseService.getAxisResponseOrNull(errorResponse);
+        var axisResponse = this._httpResponseService.getAxisResponseOrNull(errorResponse);
 
         if (axisResponse != null) {
-          this._responseService.handleAxisResponse(errorResponse, axisResponse);
+          this._httpResponseService.handleAxisResponse(errorResponse, axisResponse);
         } else {
-          this._responseService.handleNonAxisErrorResponse(errorResponse);
+          this._httpResponseService.handleNonAxisErrorResponse(errorResponse);
         }
 
         return throwError(error);

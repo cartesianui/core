@@ -14,12 +14,12 @@ export interface IErrorInfo {
   validationErrors: IValidationErrorInfo[];
 }
 
-export interface IAjaxResponse {
+export interface IAxisResponse {
   success: boolean;
 
   result?: any;
 
-  targetUrl?: string;
+  redirectUrl?: string;
 
   error?: IErrorInfo;
 
