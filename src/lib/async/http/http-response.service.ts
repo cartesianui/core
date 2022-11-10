@@ -49,9 +49,9 @@ export class HttpResponseService {
 
   showError(error: IErrorInfo): any {
     if (error.details) {
-      return this._notifier.error(error.details, error.message || this.defaultError.message);
+      return this._notifier.error(error.details as string, error.message as string || this.defaultError.message as string);
     } else {
-      return this._notifier.error(error.message || this.defaultError.message);
+      return this._notifier.error(error.message as string || this.defaultError.message as string);
     }
   }
 
@@ -65,7 +65,6 @@ export class HttpResponseService {
 
   handleUnAuthorizedResponse(messagePromise: any, redirectUrl?: string) {
     const self = this;
-
     if (messagePromise) {
       messagePromise.done(() => {
         this.redirect(redirectUrl || '/');
@@ -100,31 +99,31 @@ export class HttpResponseService {
   handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
     var cloneResponse: HttpResponse<any>;
 
-    if (axisResponse.success) {
+    if (axisResponse.errors) {
       cloneResponse = response.clone({
-        body: axisResponse.result
+        body: { errors: axisResponse?.errors, message: axisResponse?.message }
       });
 
-      if (axisResponse.redirectUrl) {
-        this.redirect(axisResponse.redirectUrl);
+      let error: IErrorInfo = this.defaultError;
+      if (axisResponse.message) {
+        error.essage = axisResponse.message;
+      }
+
+      this.logError(error);
+      this.showError(error);
+
+      if (response.status === 401) {
+        this.handleUnAuthorizedResponse(null, axisResponse?.__redirectUrl);
       }
     } else {
       cloneResponse = response.clone({
-        body: axisResponse.result
+        body: { data: axisResponse?.data, meta: axisResponse?.meta }
       });
-
-      if (!axisResponse.error) {
-        axisResponse.error = this.defaultError;
-      }
-
-      this.logError(axisResponse.error);
-      this.showError(axisResponse.error);
-
-      if (response.status === 401) {
-        this.handleUnAuthorizedResponse(null, axisResponse.redirectUrl);
+      if (axisResponse.__redirectUrl) {
+        this.redirect(axisResponse.__redirectUrl);
       }
     }
-
+  
     return cloneResponse;
   }
 
@@ -145,9 +144,9 @@ export class HttpResponseService {
     }
 
     var responseObj = JSON.parse(JSON.stringify(response.body));
-    if (!responseObj.__axis) {
-      return null;
-    }
+    // if (!responseObj.__axis) {
+    //   return null;
+    // }
 
     return responseObj as IAxisResponse;
   }

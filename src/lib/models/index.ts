@@ -1,29 +1,19 @@
-export interface IValidationErrorInfo {
-  message: string;
-
-  members: string[];
-}
-
+// Request Errors
 export interface IErrorInfo {
-  code: number;
-
-  message: string;
-
-  details: string;
-
-  validationErrors: IValidationErrorInfo[];
+  [key:string]: Array<string> | string
 }
 
 export interface IAxisResponse {
-  success: boolean;
 
-  result?: any;
+  data?: any;
 
-  redirectUrl?: string;
+  meta?: any;
 
-  error?: IErrorInfo;
+  message?: string,
 
-  unAuthorizedRequest: boolean;
+  errors?: Array<IErrorInfo>;
 
-  __axis: boolean;
+  __redirectUrl?: string;
+
+  __axis?: boolean;
 }

@@ -175,7 +175,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleErrorResponse(error: any): Observable<never> {
-    return this._httpResponseService.extractContent(error.error).pipe(
+    return this._httpResponseService.extractContent(error).pipe(
       switchMap((json) => {
         const errorBody = json == '' || json == 'null' ? {} : JSON.parse(json);
         const errorResponse = new HttpResponse({
