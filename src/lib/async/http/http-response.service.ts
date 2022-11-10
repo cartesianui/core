@@ -98,7 +98,7 @@ export class HttpResponseService {
 
   handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
     var cloneResponse: HttpResponse<any>;
-
+    
     if (axisResponse.errors) {
       cloneResponse = response.clone({
         body: { errors: axisResponse?.errors, message: axisResponse?.message }
@@ -123,7 +123,6 @@ export class HttpResponseService {
         this.redirect(axisResponse.__redirectUrl);
       }
     }
-  
     return cloneResponse;
   }
 
