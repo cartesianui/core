@@ -9,11 +9,19 @@ export interface IAxisResponse {
 
   meta?: any;
 
+  access_token?: string;
+
+  expire_in?: any;
+
+  refresh_token?: string;
+
+  token_type?: string;
+
   message?: string,
 
   errors?: Array<IErrorInfo>;
 
-  __redirectUrl?: string;
+  __redirect_url?: string;
 
   __axis?: boolean;
 }
