@@ -84,7 +84,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     modifiedHeaders = this.addAcceptLanguageHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantIdHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
-    modifiedHeaders = this.addContextHeader(modifiedHeaders);
+    modifiedHeaders = this.addCustomHeaders(modifiedHeaders);
 
     return request.clone({
       headers: modifiedHeaders
@@ -132,15 +132,15 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     return headers;
   }
 
-  protected addContextHeader(headers: HttpHeaders): HttpHeaders {
-    let headerAttribute = axis.context.headerAttribute;
-    let contextConfiguration = AppConstants.interceptor.context;
+  protected addCustomHeaders(headers: HttpHeaders): HttpHeaders {
+    let headerAttribute = axis.headers.headerAttribute;
+    let headersConfiguration = AppConstants.interceptor.headers;
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
-      if (contextConfiguration !== undefined) {
-        headers = headers.set(headerAttribute, contextConfiguration.header);
+      if (headersConfiguration !== undefined ) {
+          headers = headers.set(headerAttribute, headersConfiguration);
       } else {
-        headers = headers.set(headerAttribute, [{"context":"personal"}]);
+        headers = headers.set(headerAttribute, {});
       }
     }
 

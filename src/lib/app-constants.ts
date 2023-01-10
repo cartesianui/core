@@ -11,9 +11,7 @@ type IInterceptorConfig = {
     overwriteHeaderAttribute: Boolean;
     host: string | string[];
   };
-  context: {
-    header: [];
-  };
+  headers: {[key: string]: string};
 }
 
 @Injectable()
@@ -36,9 +34,7 @@ export class AppConstants {
       overwriteHeaderAttribute: false,
       host: ''
     },
-    context: {
-      header: [],
-    }
+    headers: {},
   };
 
   static readonly userManagement = {
