@@ -11,6 +11,9 @@ type IInterceptorConfig = {
     overwriteHeaderAttribute: Boolean;
     host: string | string[];
   };
+  context: {
+    header: [];
+  };
 }
 
 @Injectable()
@@ -32,6 +35,9 @@ export class AppConstants {
     tenancy: {
       overwriteHeaderAttribute: false,
       host: ''
+    },
+    context: {
+      header: [],
     }
   };
 
