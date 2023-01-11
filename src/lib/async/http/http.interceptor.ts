@@ -133,12 +133,12 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addCustomHeaders(headers: HttpHeaders): HttpHeaders {
-    let headersConfiguration = AppConstants.interceptor.headers;
+    let customHeaders = AppConstants.interceptor.headers;
 
     if (headers) {
-      if (headersConfiguration !== undefined ) {
-        Object.keys(headersConfiguration).forEach(function(key) {
-          headers = headers.set('CustomHeader', headersConfiguration[key]);
+      if (customHeaders !== undefined ) {
+        Object.keys(customHeaders).forEach(function(key) {
+          headers = headers.set(key, customHeaders[key]);
         });
       } else {
         headers = headers.set('CustomHeader', {});
