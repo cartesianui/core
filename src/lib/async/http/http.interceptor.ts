@@ -140,8 +140,6 @@ export class AxisHttpInterceptor implements HttpInterceptor {
         Object.keys(customHeaders).forEach(function(key) {
           headers = headers.set(key, customHeaders[key]);
         });
-      } else {
-        headers = headers.set('CustomHeader', {});
       }
     }
 
