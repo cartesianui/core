@@ -84,6 +84,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     modifiedHeaders = this.addAcceptLanguageHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantIdHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
+    modifiedHeaders = this.addCustomHeaders(modifiedHeaders);
 
     return request.clone({
       headers: modifiedHeaders
@@ -125,6 +126,20 @@ export class AxisHttpInterceptor implements HttpInterceptor {
         headers = headers.set(headerAttribute, tenancyConfiguration.host);
       } else {
         headers = headers.set(headerAttribute, this.getHostName());
+      }
+    }
+
+    return headers;
+  }
+
+  protected addCustomHeaders(headers: HttpHeaders): HttpHeaders {
+    let customHeaders = AppConstants.interceptor.headers;
+
+    if (headers) {
+      if (customHeaders !== undefined ) {
+        Object.keys(customHeaders).forEach(function(key) {
+          headers = headers.set(key, customHeaders[key]);
+        });
       }
     }
 
