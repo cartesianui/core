@@ -9,7 +9,7 @@ export class HttpAdapter {
   static baseAdapter(response: HttpResponse<any>, adapterFn?: Function): any {
     const status = response.status;
 
-    const responseBlob = response instanceof HttpResponse ? response.body : (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+    const responseBlob = response instanceof HttpResponse ? response.body : (<any>response).error instanceof Blob ? (<any>response).error : (<any>response).errors instanceof Blob ? (<any>response).errors : undefined;
 
     let _headers: any = {};
     if (response.headers) {
