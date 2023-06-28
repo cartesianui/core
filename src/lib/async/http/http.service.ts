@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable, throwError as _observableThrow } from 'rxjs';
-import { mergeMap as _observableMergeMap, catchError as _observableCatch } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { mergeMap, catchError } from 'rxjs/operators';
 import { HttpAdapter } from './http.adapter';
 import { AppConstants } from '../../app-constants';
 import { convertObjectKeysToSnake, isObject } from '../../services';
@@ -61,19 +61,19 @@ export class HttpService {
   protected responseInterceptor(observableRes: Observable<any>, adapterFn?: Function): Observable<any> {
     return observableRes
       .pipe(
-        _observableMergeMap((response_: any) => {
+        mergeMap((response_: any) => {
           return HttpAdapter.baseAdapter(response_, adapterFn);
         })
       )
       .pipe(
-        _observableCatch((response_: any) => {
+        catchError((response_: any) => {
           if (response_ instanceof HttpResponse) {
             try {
               return HttpAdapter.baseAdapter(response_, adapterFn);
             } catch (e) {
-              return <Observable<any>>(<any>_observableThrow(e));
+              return <Observable<any>>(<any>throwError(() => e));
             }
-          } else return <Observable<any>>(<any>_observableThrow(response_));
+          } else return <Observable<any>>(<any>throwError(() => response_));
         })
       );
   }

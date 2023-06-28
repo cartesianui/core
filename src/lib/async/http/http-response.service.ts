@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppConstants } from '../../app-constants';
-import { MessageService, NotifyService, LogService, extractContent } from '../../services';
+import { MessageService, NotifyService, LogService, extractContent, isArray } from '../../services';
 import { IErrorInfo, IAxisResponse } from '../../models';
 
 
@@ -11,9 +11,7 @@ import { IErrorInfo, IAxisResponse } from '../../models';
 })
 export class HttpResponseService {
   constructor(private _messageService: MessageService, private _notifySertvice: NotifyService, private _logService: LogService) {
-    this._notifier = AppConstants.interceptor.error.presenter === 'message' 
-                            ? _messageService 
-                            : _notifySertvice;
+    this._notifier = AppConstants.interceptor.error.presenter === 'message' ? _messageService : _notifySertvice;
   }
 
   _notifier: MessageService | NotifyService;
@@ -49,9 +47,9 @@ export class HttpResponseService {
 
   showError(error: IErrorInfo): any {
     if (error.details) {
-      return this._notifier.error(error.details as string, error.message as string || this.defaultError.message as string);
+      return this._notifier.error(error.details as string, (error.message as string) || (this.defaultError.message as string), {});
     } else {
-      return this._notifier.error(error.message as string || this.defaultError.message as string);
+      return this._notifier.error((error.message as string) || (this.defaultError.message as string));
     }
   }
 
@@ -74,7 +72,7 @@ export class HttpResponseService {
     }
   }
 
-  handleNonAxisErrorResponse(response: HttpResponse<any>) {
+  handleErrorResponse(response: HttpResponse<any>) {
     const self = this;
 
     switch (response.status) {
@@ -96,43 +94,12 @@ export class HttpResponseService {
     }
   }
 
-  handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
-    var cloneResponse: HttpResponse<any>;
-    
-    if (axisResponse.errors) {
-      cloneResponse = response.clone({
-        body: { errors: axisResponse?.errors, message: axisResponse?.message }
-      });
-
-      let error: IErrorInfo = this.defaultError;
-      if (axisResponse.message) {
-        error.essage = axisResponse.message;
-      }
-
-      this.logError(error);
-      this.showError(error);
-
-      if (response.status === 401) {
-        this.handleUnAuthorizedResponse(null, axisResponse?.__redirect_url);
-      }
-    } else {
-      let { data, meta, ...rest } = axisResponse;
-      cloneResponse = response.clone({
-        body: { data: data, meta: meta, ...rest }
-      });
-      if (axisResponse.__redirect_url) {
-        this.redirect(axisResponse.__redirect_url);
-      }
-    }
-    return cloneResponse;
-  }
-
-  getAxisResponseOrNull(response: HttpResponse<any>): IAxisResponse | null {
+  getAxisResponse(response: HttpResponse<any>): IAxisResponse | null {
     if (!response || !response.headers) {
       return null;
     }
 
-    var contentType = response.headers.get('Content-Type');
+    const contentType = response.headers.get('Content-Type');
     if (!contentType) {
       this._logService.warn('Content-Type is not sent!');
       return null;
@@ -143,16 +110,54 @@ export class HttpResponseService {
       return null;
     }
 
-    var responseObj = JSON.parse(JSON.stringify(response.body));
-    // if (!responseObj.__axis) {
-    //   return null;
-    // }
+    const responseObj = JSON.parse(JSON.stringify(response.body));
+    responseObj.__axis = true;
 
     return responseObj as IAxisResponse;
   }
 
+  handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
+    let cloneResponse: HttpResponse<any>;
+
+    if (axisResponse.errors) {
+      const error: IErrorInfo = this.defaultError;
+      const { errors, message } = axisResponse;
+      if (message) {
+        error.message = message;
+      }
+      if (errors) {
+        const summary = Object.keys(errors).reduce(function (res, v) {
+          if(isArray(errors[v])){
+            res = res.concat(errors[v] as string[])
+          } else res.push(errors[v] as string);
+          return res;
+        }, [] as string[]);
+        error.details = summary.join('<br/>');
+      }
+      cloneResponse = response.clone({
+        body: { errors: errors, message: message }
+      });
+
+      this.logError(error);
+      this.showError(error);
+
+      if (response.status === 401) {
+        this.handleUnAuthorizedResponse(null, axisResponse?.__redirect_url);
+      }
+    } else {
+      const { data, meta, ...rest } = axisResponse;
+      cloneResponse = response.clone({
+        body: { data: data, meta: meta, ...rest }
+      });
+      if (axisResponse.__redirect_url) {
+        this.redirect(axisResponse.__redirect_url);
+      }
+    }
+    return cloneResponse;
+  }
+
   handleResponse(response: HttpResponse<any>): HttpResponse<any> {
-    var axisResponse = this.getAxisResponseOrNull(response);
+    const axisResponse = this.getAxisResponse(response);
     if (axisResponse == null) {
       return response;
     }
@@ -160,7 +165,7 @@ export class HttpResponseService {
     return this.handleAxisResponse(response, axisResponse);
   }
 
-  extractContent(content: any): Observable<string> {
+  extractContent(content: any): Observable<any> {
     return extractContent(content);
   }
 }

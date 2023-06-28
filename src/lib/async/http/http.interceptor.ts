@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, throwError} from 'rxjs';
+import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
 import { switchMap, filter, take, catchError, map } from 'rxjs/operators';
 import { AppConstants } from '../../app-constants';
 import { TokenService, RefreshTokenService, UtilsService } from '../../services';
@@ -22,10 +22,12 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     var modifiedRequest = this.normalizeRequestHeaders(request);
     return next.handle(modifiedRequest).pipe(
       catchError((error) => {
-        if (error instanceof HttpErrorResponse && error.status === 401) {
-          return this.tryAuthWithRefreshToken(request, next, error);
-        } else {
-          return this.handleErrorResponse(error);
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === 401) {
+            return this.tryAuthWithRefreshToken(request, next, error);
+          } else {
+            return this.handleErrorResponse(error);
+          }
         }
       }),
       switchMap((event) => {
@@ -136,8 +138,8 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     let customHeaders = AppConstants.interceptor.headers;
 
     if (headers) {
-      if (customHeaders !== undefined ) {
-        Object.keys(customHeaders).forEach(function(key) {
+      if (customHeaders !== undefined) {
+        Object.keys(customHeaders).forEach(function (key) {
           headers = headers.set(key, customHeaders[key]);
         });
       }
@@ -163,20 +165,16 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected handleSuccessResponse(event: HttpEvent<any>): Observable<HttpEvent<any>> {
-    var self = this;
-
     if (event instanceof HttpResponse) {
       if (event.body instanceof Blob && event.body.type && event.body.type.indexOf('application/json') >= 0) {
-        return self._httpResponseService.extractContent(event.body).pipe(
+        return this._httpResponseService.extractContent(event.body).pipe(
           map((json) => {
             const responseBody = json == 'null' ? {} : JSON.parse(json);
-
-            var modifiedResponse = self._httpResponseService.handleResponse(
+            const modifiedResponse = this._httpResponseService.handleResponse(
               event.clone({
                 body: responseBody
               })
             );
-
             return modifiedResponse.clone({
               body: new Blob([JSON.stringify(modifiedResponse.body)], {
                 type: 'application/json'
@@ -189,25 +187,23 @@ export class AxisHttpInterceptor implements HttpInterceptor {
     return of(event);
   }
 
-  protected handleErrorResponse(error: any): Observable<never> {
-    return this._httpResponseService.extractContent(error).pipe(
+  protected handleErrorResponse(response: HttpErrorResponse): Observable<any> {
+    return this._httpResponseService.extractContent(response.error).pipe(
       switchMap((json) => {
         const errorBody = json == '' || json == 'null' ? {} : JSON.parse(json);
-        const errorResponse = new HttpResponse({
-          headers: error.headers,
-          status: error.status,
+        const cloneResponse = new HttpResponse({
+          headers: response.headers,
+          status: response.status,
           body: errorBody
         });
-
-        var axisResponse = this._httpResponseService.getAxisResponseOrNull(errorResponse);
-
-        if (axisResponse != null) {
-          this._httpResponseService.handleAxisResponse(errorResponse, axisResponse);
+        const axisResponse = this._httpResponseService.getAxisResponse(cloneResponse);
+        if (axisResponse) {
+          this._httpResponseService.handleAxisResponse(cloneResponse, axisResponse);
         } else {
-          this._httpResponseService.handleNonAxisErrorResponse(errorResponse);
+          this._httpResponseService.handleErrorResponse(cloneResponse);
         }
 
-        return throwError(error);
+        return throwError(() => axisResponse ?? cloneResponse);
       })
     );
   }

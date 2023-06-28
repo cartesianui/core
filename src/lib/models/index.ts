@@ -1,6 +1,11 @@
 // Request Errors
+export interface IError {
+  [key:string]: Array<string> | string;
+}
+
 export interface IErrorInfo {
-  [key:string]: Array<string> | string
+  message?: string;
+  details?: string;
 }
 
 export interface IAxisResponse {
@@ -19,7 +24,7 @@ export interface IAxisResponse {
 
   message?: string,
 
-  errors?: Array<IErrorInfo>;
+  errors?: IError;
 
   __redirect_url?: string;
 
