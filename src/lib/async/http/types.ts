@@ -10,18 +10,18 @@ export type Column = Array<ColumnItem>;
 
 export type Comparison = 'and' | 'or';
 
-export interface WhereItem {
+export type WhereItem = {
   column: string;
   operator: Operator;
   value: Value;
-}
+};
 
-export interface OrderItem {
+export type OrderItem = {
   column: string;
   direction: OrderDirection;
-}
+};
 
-export interface Fields {
+export type Fields = {
   search: string[];
   searchFields: string[];
   orderBy: string[];
@@ -31,10 +31,9 @@ export interface Fields {
   page: number[];
   limit: number[];
   searchJoin: [Comparison];
-  [key: string]: Fields[keyof Fields];
-}
+} & { [key: string]: Fields[keyof Fields] };
 
-export interface Pairs {
+export type Pairs = {
   search?: string;
   searchFields?: string;
   orderBy?: string;
@@ -44,5 +43,28 @@ export interface Pairs {
   page?: string;
   limit?: string;
   searchJoin?: string;
-  [key: string]: Pairs[keyof Pairs];
-}
+} & { [key: string]: Pairs[keyof Pairs] };
+
+// Request Errors
+export type IError = {
+  [key: string]: Array<string> | string;
+};
+
+export type IErrorInfo = {
+  cose?: string | number;
+  message?: string;
+  details?: string;
+};
+
+export type IAxisResponse = {
+  data?: any;
+  meta?: any;
+  access_token?: string;
+  expire_in?: any;
+  refresh_token?: string;
+  token_type?: string;
+  message?: string;
+  errors?: IError;
+  __redirect_url?: string;
+  __axis?: boolean;
+};

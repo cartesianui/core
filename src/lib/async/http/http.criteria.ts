@@ -1,5 +1,5 @@
 import { isString } from '../../services/utils/helpers';
-import { WhereItem, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './type';
+import { WhereItem, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './types';
 
 export class RequestCriteria<SearchForm> {
   public form: SearchForm;
