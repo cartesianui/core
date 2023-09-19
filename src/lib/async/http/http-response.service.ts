@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AppConstants } from '../../app-constants';
 import { MessageService, NotifyService, LogService, extractContent, isArray } from '../../services';
 import { IErrorInfo, IAxisResponse } from './types';
-import { HttpErrorService } from './http-error.service';
+import { HttpNotificationService } from './http-notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class HttpResponseService {
     private _messageService: MessageService,
     private _notifySertvice: NotifyService,
     private _logService: LogService,
-    private _errorService: HttpErrorService
+    private _errorService: HttpNotificationService
   ) {
     this._notifier = AppConstants.interceptor.error.presenter === 'message' ? _messageService : _notifySertvice;
   }

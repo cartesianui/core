@@ -5,7 +5,7 @@ import { IError } from './types';
 @Injectable({
   providedIn: 'root'
 })
-export class HttpErrorService {
+export class HttpNotificationService {
 
   public serverErrors$ = new Subject<IError>();
 
