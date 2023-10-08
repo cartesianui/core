@@ -3,14 +3,19 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppConstants } from '../../app-constants';
 import { MessageService, NotifyService, LogService, extractContent, isArray } from '../../services';
-import { IErrorInfo, IAxisResponse } from '../../models';
-
+import { IErrorInfo, IAxisResponse } from './types';
+import { HttpNotificationService } from './http-notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpResponseService {
-  constructor(private _messageService: MessageService, private _notifySertvice: NotifyService, private _logService: LogService) {
+  constructor(
+    private _messageService: MessageService,
+    private _notifySertvice: NotifyService,
+    private _logService: LogService,
+    private _errorService: HttpNotificationService
+  ) {
     this._notifier = AppConstants.interceptor.error.presenter === 'message' ? _messageService : _notifySertvice;
   }
 
@@ -43,6 +48,10 @@ export class HttpResponseService {
 
   logError(error: IErrorInfo): void {
     this._logService.error(error);
+  }
+
+  getErrorInfoFromCode(code): IErrorInfo {
+    return AppConstants.defaultHttpErrorCodes[code];
   }
 
   showError(error: IErrorInfo): any {
@@ -89,7 +98,8 @@ export class HttpResponseService {
         self.showError(self.defaultError504);
         break;
       default:
-        self.showError(self.defaultError);
+        const errorInfo: IErrorInfo = self.getErrorInfoFromCode(response.status) ?? self.defaultError;
+        self.showError(errorInfo);
         break;
     }
   }
@@ -127,8 +137,8 @@ export class HttpResponseService {
       }
       if (errors) {
         const summary = Object.keys(errors).reduce(function (res, v) {
-          if(isArray(errors[v])){
-            res = res.concat(errors[v] as string[])
+          if (isArray(errors[v])) {
+            res = res.concat(errors[v] as string[]);
           } else res.push(errors[v] as string);
           return res;
         }, [] as string[]);
@@ -138,6 +148,7 @@ export class HttpResponseService {
         body: { errors: errors, message: message }
       });
 
+      this._errorService.dispatch(errors);
       this.logError(error);
       this.showError(error);
 
