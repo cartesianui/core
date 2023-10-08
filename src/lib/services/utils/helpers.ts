@@ -71,7 +71,7 @@ export function isString(x: any): x is string {
  *
  * @param val
  */
-function toCamel(s) {
+export function toCamel(s) {
   return s.replace(/([-_][a-z0-9])/gi, ($1) => {
     return $1.toUpperCase().replace('-', '').replace('_', '');
   });
@@ -82,7 +82,7 @@ function toCamel(s) {
  *
  * @param val
  */
-function toSnake(s) {
+export function toSnake(s) {
   return s.replace(/[A-Z]/g, (letter) => {
     return `_${letter?.toLowerCase()}`;
   });

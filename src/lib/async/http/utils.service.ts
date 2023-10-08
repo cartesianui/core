@@ -17,8 +17,8 @@ export function methodBuilder(method: string) {
         const body: string = createBody(pBody, descriptor, args);
         const resUrl: string = createPath(url, pPath, args);
         const headers: HttpHeaders = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
-        const params: HttpParams | boolean = createCriteria(pCriteria, args);
-        const query: HttpParams = createQuery(pQuery, args);
+        const criteriaParams: HttpParams | boolean = createHttpParamsFromCriteria(pCriteria, args);
+        const params: HttpParams = createHttpParamsFromQuery(criteriaParams instanceof HttpParams ? criteriaParams : new HttpParams(), pQuery, args);
 
         let options: any = {
           body: body,
@@ -29,10 +29,6 @@ export function methodBuilder(method: string) {
 
         if (params && params instanceof HttpParams) {
           options.params = params;
-        }
-
-        if (query && query instanceof HttpParams) {
-          options.params = options.params ? options.params.concat(`&${query}`) : query;
         }
 
         // intercept the request
@@ -93,8 +89,7 @@ function createPath(url: string, pPath: Array<any>, args: Array<any>): string {
   return resUrl;
 }
 
-function createQuery(pQuery: any, args: Array<any>): HttpParams {
-  let params = new HttpParams();
+function createHttpParamsFromQuery(params: HttpParams, pQuery: any, args: Array<any>): HttpParams {
   if (pQuery) {
     pQuery
       .filter((p) => args[p.parameterIndex]) // filter out optional parameters
@@ -112,7 +107,7 @@ function createQuery(pQuery: any, args: Array<any>): HttpParams {
   return params;
 }
 
-function createCriteria(pCriteria: RequestCriteria<any>, args: Array<any>): HttpParams | boolean {
+function createHttpParamsFromCriteria(pCriteria: RequestCriteria<any>, args: Array<any>): HttpParams | boolean {
   if (pCriteria && pCriteria[0] && args[pCriteria[0].parameterIndex] && args[pCriteria[0].parameterIndex] instanceof RequestCriteria) {
     const criteria = args[pCriteria[0].parameterIndex].toString();
     const httpParams = new HttpParams({ fromString: criteria });
