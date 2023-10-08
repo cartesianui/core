@@ -1,22 +1,22 @@
-import { isString } from '../../services/utils/helpers';
-import { WhereItem, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './types';
+import { toCamel, isString } from '../../services/utils/helpers';
+import { WhereItem, WhereOptions, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './types';
 
-export class RequestCriteria<SearchForm> {
-  public form: SearchForm;
+export class RequestCriteria<TSearchForm> {
+  public form: TSearchForm;
   private wheres: WhereItem[] = [];
   private orders: OrderItem[] = [];
   private relations: string[] = [];
   private filters: string[] = [];
   private limitPerPage: number = 30;
   private pageNo: number = 1;
-  private searchJoinComparison: Comparison = 'or';
+  private searchJoinComparison: Comparison = 'and';
   private operators: string[] = ['=', 'like'];
 
-  constructor(form: SearchForm) {
+  constructor(form: TSearchForm) {
     this.form = form;
   }
 
-  where(column: string | Column, operator: Operator | Value = null, value: Value = null) {
+  where(column: string | Column, operator: Operator | Value = null, value: Value = null, options?: WhereOptions) {
     if (Array.isArray(column)) {
       return this.whereArray(column);
     }
@@ -32,10 +32,14 @@ export class RequestCriteria<SearchForm> {
       operator = '=';
     }
 
+    // clean old existance of same column
+    this.wheres = this.wheres.filter((w) => w.column !== column);
+
     this.wheres.push({
       column,
       operator,
-      value
+      value,
+      options
     });
 
     return this;
@@ -85,6 +89,23 @@ export class RequestCriteria<SearchForm> {
   }
 
   /**
+   *
+   * @param field column name(s) to be searched in, string, comma separated or array
+   * @param value
+   */
+  setSearchField(fields: string | string[], value: string) {
+    const formFields = Object.keys(this.form);
+    if (!Array.isArray(fields)) {
+      fields = fields.split(',');
+    }
+    fields.map((f) => {
+      if (formFields.includes(toCamel(f))) {
+        this.form[toCamel(f)].value = value ?? '';
+      }
+    });
+  }
+
+  /**
    * Multiple where nested, such as [[column, value], [column, operator, value]]
    * @param {array} column
    */
@@ -98,10 +119,12 @@ export class RequestCriteria<SearchForm> {
 
   protected feedWhereFromSearchForm() {
     if (this.form) {
-      for (const field in this.form) {
-        const data = this.form[field];
-        if (data['value']) {
-          this.where(data['column'], data['operator'], data['value']);
+      for (const f in this.form) {
+        const field = this.form[f] as WhereItem;
+        if (field.value) {
+          this.where(field.column, field.operator, field.value, field.options);
+        } else {
+          this.wheres = this.wheres.filter((c) => c.column !== field.column);
         }
       }
     }
@@ -175,5 +198,31 @@ export class RequestCriteria<SearchForm> {
     str = str.substring(0, str.length - 1);
 
     return str;
+  }
+
+  searchCriteriaToUrlParams(): string {
+    const search: string[] = [];
+    this.feedWhereFromSearchForm();
+
+    this.wheres.forEach((field) => {
+      if (field?.options?.url !== false) search.push(`${field.column}:${field.value}`);
+    });
+
+    let str = '';
+    if (Array.isArray(search) && search.length > 0) {
+      str += `?search=${search.join(';')}`;
+    }
+    return str;
+  }
+
+  urlParamsToSearchCriteria(searchString: string): void {
+    const formFields = Object.keys(this.form);
+    let reverseCommaSplitted = searchString.split(',');
+    reverseCommaSplitted.map((str) => {
+      let f = str.split(':');
+      if (formFields.includes(toCamel(f[0]))) {
+        this.form[toCamel(f[0])].value = f[1] ?? '';
+      }
+    });
   }
 }

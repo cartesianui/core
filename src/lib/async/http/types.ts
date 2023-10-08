@@ -10,10 +10,13 @@ export type Column = Array<ColumnItem>;
 
 export type Comparison = 'and' | 'or';
 
+export type WhereOptions = { url: boolean; [key: string]: string | boolean } | null;
+
 export type WhereItem = {
   column: string;
   operator: Operator;
   value: Value;
+  options?: WhereOptions;
 };
 
 export type OrderItem = {
