@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -7,14 +7,14 @@ import { Injectable } from '@angular/core';
 })
 export class TenancyService {
   get isEnabled(): boolean {
-    return axis.tenancy.isEnabled;
+    return cartesian.tenancy.isEnabled;
   }
 
   getTenantId(): string {
-    return axis.tenancy.getTenantIdCookie();
+    return cartesian.tenancy.getTenantIdCookie();
   }
 
   setTenantId(tenantId) {
-    axis.tenancy.setTenantIdCookie(tenantId);
+    cartesian.tenancy.setTenantIdCookie(tenantId);
   }
 }

@@ -46,12 +46,12 @@ To install this library, run:
 $ npm i @cartesianui/core --save
 ```
 
-## AxisHttpInterceptor
+## CartesianHttpInterceptor
 
-In order to use AxisHttpInterceptor, first import it into module like below;
+In order to use CartesianHttpInterceptor, first import it into module like below;
 
 ```ts
-import { AxisHttpInterceptor } from '@cartesianui/core';
+import { CartesianHttpInterceptor } from '@cartesianui/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 ```
 
@@ -63,7 +63,7 @@ imports: [
 ],
 providers: [
     ///other providers
-    { provide: HTTP_INTERCEPTORS, useClass: AxisHttpInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: CartesianHttpInterceptor, multi: true }
 ]
 ```
 

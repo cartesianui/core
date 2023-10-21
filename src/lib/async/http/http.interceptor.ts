@@ -6,10 +6,10 @@ import { AppConstants } from '../../app-constants';
 import { TokenService, RefreshTokenService, UtilsService } from '../../services';
 import { HttpResponseService } from './http-response.service';
 
-declare const axis: any;
+declare const cartesian: any;
 
 @Injectable()
-export class AxisHttpInterceptor implements HttpInterceptor {
+export class CartesianHttpInterceptor implements HttpInterceptor {
   private _httpResponseService: HttpResponseService;
   private _tokenService: TokenService = new TokenService();
   private _utilsService: UtilsService = new UtilsService();
@@ -102,7 +102,7 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addAcceptLanguageHeader(headers: HttpHeaders): HttpHeaders {
-    let cookieLangValue = this._utilsService.getCookieValue('Axis.Localization.CultureName');
+    let cookieLangValue = this._utilsService.getCookieValue('Cartesian.Localization.CultureName');
     if (cookieLangValue && headers && !headers.has('Accept-Language')) {
       headers = headers.set('Accept-Language', cookieLangValue);
     }
@@ -111,16 +111,16 @@ export class AxisHttpInterceptor implements HttpInterceptor {
   }
 
   protected addTenantIdHeader(headers: HttpHeaders): HttpHeaders {
-    let cookieTenantIdValue = this._utilsService.getCookieValue(axis.tenancy.tenantIdCookieName);
-    if (cookieTenantIdValue && headers && !headers.has(axis.tenancy.tenantIdCookieName)) {
-      headers = headers.set(axis.tenancy.tenantIdCookieName, cookieTenantIdValue);
+    let cookieTenantIdValue = this._utilsService.getCookieValue(cartesian.tenancy.tenantIdCookieName);
+    if (cookieTenantIdValue && headers && !headers.has(cartesian.tenancy.tenantIdCookieName)) {
+      headers = headers.set(cartesian.tenancy.tenantIdCookieName, cookieTenantIdValue);
     }
 
     return headers;
   }
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
-    let headerAttribute = axis.tenancy.headerAttribute;
+    let headerAttribute = cartesian.tenancy.headerAttribute;
     let tenancyConfiguration = AppConstants.interceptor.tenancy;
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
@@ -196,14 +196,14 @@ export class AxisHttpInterceptor implements HttpInterceptor {
           status: response.status,
           body: errorBody
         });
-        const axisResponse = this._httpResponseService.getAxisResponse(cloneResponse);
-        if (axisResponse) {
-          this._httpResponseService.handleAxisResponse(cloneResponse, axisResponse);
+        const cartesianResponse = this._httpResponseService.getCartesianResponse(cloneResponse);
+        if (cartesianResponse) {
+          this._httpResponseService.handleCartesianResponse(cloneResponse, cartesianResponse);
         } else {
           this._httpResponseService.handleErrorResponse(cloneResponse);
         }
 
-        return throwError(() => axisResponse ?? cloneResponse);
+        return throwError(() => cartesianResponse ?? cloneResponse);
       })
     );
   }

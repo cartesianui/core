@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -6,19 +6,19 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LocalizationService {
-  get languages(): axis.localization.ILanguageInfo[] {
-    return axis.localization.languages;
+  get languages(): cartesian.localization.ILanguageInfo[] {
+    return cartesian.localization.languages;
   }
 
-  get currentLanguage(): axis.localization.ILanguageInfo {
-    return axis.localization.currentLanguage;
+  get currentLanguage(): cartesian.localization.ILanguageInfo {
+    return cartesian.localization.currentLanguage;
   }
 
   localize(key: string, sourceName: string): string {
-    return axis.localization.localize(key, sourceName);
+    return cartesian.localization.localize(key, sourceName);
   }
 
   getSource(sourceName: string): (...key: string[]) => string {
-    return axis.localization.getSource(sourceName);
+    return cartesian.localization.getSource(sourceName);
   }
 }

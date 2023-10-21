@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 import { Injectable, Injector } from '@angular/core';
 
 @Injectable({
@@ -8,7 +8,7 @@ export class NotifyService {
   private _toasterNotificationService = null;
 
   constructor(private _injector: Injector) {
-    this._toasterNotificationService = axis.notify;
+    this._toasterNotificationService = cartesian.notify;
   }
 
   info(message: string, title?: string, options?: any): void {

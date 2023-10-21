@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable, Injector } from '@angular/core';
 
@@ -9,7 +9,7 @@ export class SessionService {
   private _session = null;
 
   constructor(private _injector: Injector) {
-    this._session = axis.session;
+    this._session = cartesian.session;
   }
 
   get isHostSide(): boolean {

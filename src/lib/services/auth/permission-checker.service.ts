@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -7,14 +7,14 @@ import { Injectable } from '@angular/core';
 })
 export class PermissionCheckerService {
   isGranted(permissionName: string): boolean {
-    return axis.auth.isGranted(permissionName);
+    return cartesian.auth.isGranted(permissionName);
   }
 
   isAnyGranted(permissions: string[]): boolean {
-    return axis.auth.isAnyGranted(...permissions);
+    return cartesian.auth.isAnyGranted(...permissions);
   }
 
   areAllGranted(permissions: string[]): boolean {
-    return axis.auth.areAllGranted(...permissions);
+    return cartesian.auth.areAllGranted(...permissions);
   }
 }

@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -6,10 +6,10 @@ import { Injectable } from '@angular/core';
 })
 export class UiService {
   setBusy(key?: any, text?: string, delay?: any): void {
-    return axis.ui.setBusy(key, text, delay);
+    return cartesian.ui.setBusy(key, text, delay);
   }
 
   clearBusy(key?: any, delay?: any): void {
-    return axis.ui.clearBusy(key, delay);
+    return cartesian.ui.clearBusy(key, delay);
   }
 }

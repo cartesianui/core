@@ -59,7 +59,7 @@ export type IErrorInfo = {
   details?: string;
 };
 
-export type IAxisResponse = {
+export type ICartesianResponse = {
   data?: any;
   meta?: any;
   access_token?: string;
@@ -69,5 +69,5 @@ export type IAxisResponse = {
   message?: string;
   errors?: IError;
   __redirect_url?: string;
-  __axis?: boolean;
+  __cartesian?: boolean;
 };

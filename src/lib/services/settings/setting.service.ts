@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -7,14 +7,14 @@ import { Injectable } from '@angular/core';
 })
 export class SettingService {
   get(name: string): string {
-    return axis.setting.get(name);
+    return cartesian.setting.get(name);
   }
 
   getBoolean(name: string): boolean {
-    return axis.setting.getBoolean(name);
+    return cartesian.setting.getBoolean(name);
   }
 
   getInt(name: string): number {
-    return axis.setting.getInt(name);
+    return cartesian.setting.getInt(name);
   }
 }

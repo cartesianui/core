@@ -1,1 +1,1 @@
-///<reference path="./node_modules/@cartesianui/js/axis.d.ts"/>
+///<reference path="./node_modules/@cartesianui/js/cartesian.d.ts"/>

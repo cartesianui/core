@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/axis.d.ts"/>
+﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
 import { Injectable } from '@angular/core';
 
@@ -6,15 +6,15 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class FeatureCheckerService {
-  get(featureName: string): axis.features.IFeature {
-    return axis.features.get(featureName);
+  get(featureName: string): cartesian.features.IFeature {
+    return cartesian.features.get(featureName);
   }
 
   getValue(featureName: string): string {
-    return axis.features.getValue(featureName);
+    return cartesian.features.getValue(featureName);
   }
 
   isEnabled(featureName: string): boolean {
-    return axis.features.isEnabled(featureName);
+    return cartesian.features.isEnabled(featureName);
   }
 }

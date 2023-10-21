@@ -3,7 +3,7 @@ import { HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppConstants } from '../../app-constants';
 import { MessageService, NotifyService, LogService, extractContent, isArray } from '../../services';
-import { IErrorInfo, IAxisResponse } from './types';
+import { IErrorInfo, ICartesianResponse } from './types';
 import { HttpNotificationService } from './http-notification.service';
 
 @Injectable({
@@ -104,7 +104,7 @@ export class HttpResponseService {
     }
   }
 
-  getAxisResponse(response: HttpResponse<any>): IAxisResponse | null {
+  getCartesianResponse(response: HttpResponse<any>): ICartesianResponse | null {
     if (!response || !response.headers) {
       return null;
     }
@@ -121,17 +121,17 @@ export class HttpResponseService {
     }
 
     const responseObj = JSON.parse(JSON.stringify(response.body));
-    responseObj.__axis = true;
+    responseObj.__cartesian = true;
 
-    return responseObj as IAxisResponse;
+    return responseObj as ICartesianResponse;
   }
 
-  handleAxisResponse(response: HttpResponse<any>, axisResponse: IAxisResponse): HttpResponse<any> {
+  handleCartesianResponse(response: HttpResponse<any>, cartesianResponse: ICartesianResponse): HttpResponse<any> {
     let cloneResponse: HttpResponse<any>;
 
-    if (axisResponse.errors) {
+    if (cartesianResponse.errors) {
       const error: IErrorInfo = this.defaultError;
-      const { errors, message } = axisResponse;
+      const { errors, message } = cartesianResponse;
       if (message) {
         error.message = message;
       }
@@ -153,27 +153,27 @@ export class HttpResponseService {
       this.showError(error);
 
       if (response.status === 401) {
-        this.handleUnAuthorizedResponse(null, axisResponse?.__redirect_url);
+        this.handleUnAuthorizedResponse(null, cartesianResponse?.__redirect_url);
       }
     } else {
-      const { data, meta, ...rest } = axisResponse;
+      const { data, meta, ...rest } = cartesianResponse;
       cloneResponse = response.clone({
         body: { data: data, meta: meta, ...rest }
       });
-      if (axisResponse.__redirect_url) {
-        this.redirect(axisResponse.__redirect_url);
+      if (cartesianResponse.__redirect_url) {
+        this.redirect(cartesianResponse.__redirect_url);
       }
     }
     return cloneResponse;
   }
 
   handleResponse(response: HttpResponse<any>): HttpResponse<any> {
-    const axisResponse = this.getAxisResponse(response);
-    if (axisResponse == null) {
+    const cartesianResponse = this.getCartesianResponse(response);
+    if (cartesianResponse == null) {
       return response;
     }
 
-    return this.handleAxisResponse(response, axisResponse);
+    return this.handleCartesianResponse(response, cartesianResponse);
   }
 
   extractContent(content: any): Observable<any> {
