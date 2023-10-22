@@ -21,6 +21,8 @@ export class AppConstants {
 
   static remoteServiceBaseUrl = '';
 
+  static authUserApiEndpoint = '/profile';
+
   static appBaseUrl = '';
 
   static appBaseHref = ''; // returns angular's base-href parameter value if used during the publish

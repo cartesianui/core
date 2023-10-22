@@ -1,15 +1,64 @@
 ﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
 
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { TokenService } from '../auth/token.service';
+import { convertObjectKeysToCamel } from '../utils/helpers';
+import { AppConstants } from '../../app-constants';
+
+type IAuthUser = {
+  [key: string]: string;
+  name?: string | undefined;
+  username?: string | undefined;
+  email?: string | undefined;
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
   private _session = null;
+  private _user: IAuthUser;
 
-  constructor(private _injector: Injector) {
+  constructor(
+    private tokenService: TokenService,
+    private httpClient: HttpClient
+  ) {
     this._session = cartesian.session;
+  }
+
+  init(): Promise<any> {
+    const token = this.tokenService.getToken();
+
+    const requestHeaders = {};
+
+    if (token) {
+      requestHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    return new Promise<IAuthUser | boolean>((resolve) => {
+      this.httpClient.get<any>(AppConstants.remoteServiceBaseUrl + AppConstants.authUserApiEndpoint, { headers: requestHeaders }).subscribe({
+        next: (result: any) => {
+          this._user = convertObjectKeysToCamel(result.data) as IAuthUser;
+          resolve(this._user);
+        },
+        error: () => {
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  get user(): IAuthUser {
+    return this._user;
+  }
+
+  get userId(): string {
+    return this.user ? this.user.id : null;
+  }
+
+  getShownLoginName(): string {
+    return this._user.name ?? this._user.email;
   }
 
   get isHostSide(): boolean {
