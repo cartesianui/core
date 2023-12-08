@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IErrorInfo } from './index';
 
-
-type IInterceptorConfig = {
+export type IInterceptorConfig = {
   error: {
     show: Boolean;
     presenter: 'message' | 'notify';
@@ -11,17 +10,25 @@ type IInterceptorConfig = {
     overwriteHeaderAttribute: Boolean;
     host: string | string[];
   };
-  headers: {[key: string]: string};
-}
+  headers: { [key: string]: string };
+};
+
+export type ApiEndpoints = {
+  login: string;
+  authenticatedUser: string;
+  [key: string]: string;
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppConstants {
-
   static remoteServiceBaseUrl = '';
 
-  static authUserApiEndpoint = '/profile';
+  static apiEndpoints: ApiEndpoints = {
+    login: '/login',
+    authenticatedUser: '/profile'
+  };
 
   static appBaseUrl = '';
 
@@ -38,7 +45,7 @@ export class AppConstants {
       overwriteHeaderAttribute: false,
       host: ''
     },
-    headers: {},
+    headers: {}
   };
 
   static readonly userManagement = {
@@ -53,7 +60,7 @@ export class AppConstants {
     encryptedAuthTokenName: '' // enc_auth_token
   };
 
-  static defaultHttpSuccessCodes = <{[key: string]: IErrorInfo}>{
+  static defaultHttpSuccessCodes = <{ [key: string]: IErrorInfo }>{
     '100': { code: 100, message: 'Continue', details: '' },
     '101': { code: 101, message: 'Switching Protocols', details: '' },
     '102': { code: 102, message: 'Processing', details: '' },

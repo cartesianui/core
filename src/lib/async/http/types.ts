@@ -62,12 +62,12 @@ export type IErrorInfo = {
 export type ICartesianResponse = {
   data?: any;
   meta?: any;
-  access_token?: string;
-  expire_in?: any;
-  refresh_token?: string;
-  token_type?: string;
+  accessToken?: string;
+  expireIn?: any;
+  refreshToken?: string;
+  tokenType?: string;
   message?: string;
   errors?: IError;
-  __redirect_url?: string;
+  __redirectUrl?: string;
   __cartesian?: boolean;
 };

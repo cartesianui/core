@@ -1,11 +1,12 @@
 import { HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AppConstants } from '../../app-constants';
 import { HttpService } from './http.service';
 import { RequestCriteria } from './http.criteria';
 import { isObject } from '../../services';
 
 export function methodBuilder(method: string) {
-  return function (url: string) {
+  return function (url: string, key: string = null) {
     return function (target: HttpService, propertyKey: string, descriptor: any) {
       const pPath = target[`${propertyKey}_Path_parameters`],
         pQuery = target[`${propertyKey}_Query_parameters`],
@@ -15,7 +16,7 @@ export function methodBuilder(method: string) {
 
       descriptor.value = function (...args: any[]) {
         const body: string = createBody(pBody, descriptor, args);
-        const resUrl: string = createPath(url, pPath, args);
+        const resUrl: string = createPath(url ? url : AppConstants.apiEndpoints[key], pPath, args);
         const headers: HttpHeaders = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
         const criteriaParams: HttpParams | boolean = createHttpParamsFromCriteria(pCriteria, args);
         const params: HttpParams = createHttpParamsFromQuery(criteriaParams instanceof HttpParams ? criteriaParams : new HttpParams(), pQuery, args);
