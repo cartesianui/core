@@ -37,12 +37,12 @@ export class SessionService {
     }
 
     return new Promise<IAuthUser | boolean>((resolve) => {
-      this.httpClient.get<any>(AppConstants.remoteServiceBaseUrl + AppConstants.authUserApiEndpoint, { headers: requestHeaders }).subscribe({
+      this.httpClient.get<any>(AppConstants.remoteServiceBaseUrl + AppConstants.apiEndpoints.authenticatedUser, { headers: requestHeaders }).subscribe({
         next: (result: any) => {
           this._user = convertObjectKeysToCamel(result.data) as IAuthUser;
           resolve(this._user);
         },
-        error: () => {
+        error: (error) => {
           resolve(false);
         }
       });

@@ -153,15 +153,15 @@ export class HttpResponseService {
       this.showError(error);
 
       if (response.status === 401) {
-        this.handleUnAuthorizedResponse(null, cartesianResponse?.__redirect_url);
+        this.handleUnAuthorizedResponse(null, cartesianResponse?.__redirectUrl);
       }
     } else {
       const { data, meta, ...rest } = cartesianResponse;
       cloneResponse = response.clone({
         body: { data: data, meta: meta, ...rest }
       });
-      if (cartesianResponse.__redirect_url) {
-        this.redirect(cartesianResponse.__redirect_url);
+      if (cartesianResponse.__redirectUrl) {
+        this.redirect(cartesianResponse.__redirectUrl);
       }
     }
     return cloneResponse;

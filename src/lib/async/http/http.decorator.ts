@@ -34,31 +34,37 @@ export function DefaultHeaders(headers: any) {
 /**
  * GET method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var GET = methodBuilder('GET');
 /**
  * POST method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var POST = methodBuilder('POST');
 /**
  * PUT method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var PUT = methodBuilder('PUT');
 /**
  * PATCH method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var PATCH = methodBuilder('PATCH');
 /**
  * DELETE method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var DELETE = methodBuilder('DELETE');
 /**
  * HEAD method
  * @param {string} url - resource url of the method
+ * @param {string} key - endpoint key as defined, only used when url is null
  */
 export var HEAD = methodBuilder('HEAD');
 
