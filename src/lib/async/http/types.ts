@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export type Operator = string;
 
 export type Value = string | string[] | number | number[] | null;
@@ -70,4 +72,12 @@ export type ICartesianResponse = {
   errors?: IError;
   __redirectUrl?: string;
   __cartesian?: boolean;
+};
+
+export type IHttpService<TModel, TCriteria> = {
+  getAll?: (criteria: TCriteria) => Observable<ICartesianResponse>;
+  getById?: (id: string) => Observable<ICartesianResponse>;
+  create?: (model: TModel) => Observable<ICartesianResponse>;
+  update?: (id: string, changes: Partial<TModel>) => Observable<ICartesianResponse>;
+  delete?: (id: string) => Observable<ICartesianResponse>;
 };

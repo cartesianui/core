@@ -129,7 +129,7 @@ export class HttpResponseService {
   handleCartesianResponse(response: HttpResponse<any>, cartesianResponse: ICartesianResponse): HttpResponse<any> {
     let cloneResponse: HttpResponse<any>;
 
-    if (cartesianResponse.errors) {
+    if ((cartesianResponse.data == null || cartesianResponse.data == undefined) && cartesianResponse.message) {
       const error: IErrorInfo = this.defaultError;
       const { errors, message } = cartesianResponse;
       if (message) {
