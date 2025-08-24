@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { RequestCriteria } from './http.criteria';
 
 export type Operator = string;
 
@@ -38,6 +39,8 @@ export type Fields = {
   searchJoin: [Comparison];
 } & { [key: string]: Fields[keyof Fields] };
 
+export type SearchForm = Record<string, WhereItem>;
+
 export type Pairs = {
   search?: string;
   searchFields?: string;
@@ -74,8 +77,8 @@ export type ICartesianResponse = {
   __cartesian?: boolean;
 };
 
-export type IHttpService<TModel, TCriteria> = {
-  getAll?: (criteria: TCriteria) => Observable<ICartesianResponse>;
+export type IHttpService<TModel> = {
+  getAll?: (criteria: RequestCriteria) => Observable<ICartesianResponse>;
   getById?: (id: string) => Observable<ICartesianResponse>;
   create?: (model: TModel) => Observable<ICartesianResponse>;
   update?: (id: string, changes: Partial<TModel>) => Observable<ICartesianResponse>;

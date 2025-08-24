@@ -1,8 +1,9 @@
+import { Injectable } from '@angular/core';
 import { toCamel, isString } from '../../services/utils/helpers';
-import { WhereItem, WhereOptions, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, Pairs } from './types';
+import { WhereItem, WhereOptions, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, SearchForm, Pairs } from './types';
 
-export class RequestCriteria<TSearchForm> {
-  public form: TSearchForm;
+export class RequestCriteria{
+  public form: SearchForm;
   private wheres: WhereItem[] = [];
   private orders: OrderItem[] = [];
   private relations: string[] = [];
@@ -12,8 +13,15 @@ export class RequestCriteria<TSearchForm> {
   private searchJoinComparison: Comparison = 'and';
   private operators: string[] = ['=', 'like'];
 
-  constructor(form: TSearchForm) {
+  constructor(form?: SearchForm) {
+    if (form) {
+      this.form = form;
+    }
+  }
+
+  initForm(form: SearchForm) {
     this.form = form;
+    return this;
   }
 
   where(column: string | Column, operator: Operator | Value = null, value: Value = null, options?: WhereOptions) {
@@ -73,7 +81,9 @@ export class RequestCriteria<TSearchForm> {
   }
 
   orderByDesc(column: string) {
-    return this.orderBy(column, 'desc');
+    this.orderBy(column, 'desc');
+
+    return this;
   }
 
   page(page: number) {
@@ -103,6 +113,8 @@ export class RequestCriteria<TSearchForm> {
         this.form[toCamel(f)].value = value ?? '';
       }
     });
+
+    return this;
   }
 
   /**
@@ -128,6 +140,8 @@ export class RequestCriteria<TSearchForm> {
         }
       }
     }
+
+    return this;
   }
 
   protected prepareValueAndOperator(value: Value, operator: Operator | Value, useDefault = false) {

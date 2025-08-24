@@ -108,7 +108,7 @@ function createHttpParamsFromQuery(params: HttpParams, pQuery: any, args: Array<
   return params;
 }
 
-function createHttpParamsFromCriteria(pCriteria: RequestCriteria<any>, args: Array<any>): HttpParams | boolean {
+function createHttpParamsFromCriteria(pCriteria: RequestCriteria, args: Array<any>): HttpParams | boolean {
   if (pCriteria && pCriteria[0] && args[pCriteria[0].parameterIndex] && args[pCriteria[0].parameterIndex] instanceof RequestCriteria) {
     const criteria = args[pCriteria[0].parameterIndex].toString();
     const httpParams = new HttpParams({ fromString: criteria });
