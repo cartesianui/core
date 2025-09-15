@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { toCamel, isString } from '../../services/utils/helpers';
+import { toCamel, isString } from '../../utils/helpers';
 import { WhereItem, WhereOptions, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, SearchForm, Pairs } from './types';
 
 export class RequestCriteria{

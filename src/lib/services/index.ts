@@ -11,4 +11,3 @@ export * from './session/session.service';
 export * from './settings/setting.service';
 export * from './utils/utils.service';
 export * from './utils/ui.service';
-export * from './utils/helpers';

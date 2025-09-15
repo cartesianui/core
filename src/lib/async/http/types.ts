@@ -59,8 +59,8 @@ export type IError = {
 };
 
 export type IErrorInfo = {
-  cose?: string | number;
-  message?: string;
+  code?: string | number;
+  message?: string; // as title
   details?: string;
 };
 

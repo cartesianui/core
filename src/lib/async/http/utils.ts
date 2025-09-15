@@ -1,13 +1,16 @@
 import { HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AppConstants } from '../../app-constants';
+import { Observable, switchMap, of } from 'rxjs';
+import { AppConfig } from '../../app-config';
 import { HttpService } from './http.service';
 import { RequestCriteria } from './http.criteria';
-import { isObject } from '../../services';
+import { isObject } from '../../utils';
 
 export function methodBuilder(method: string) {
   return function (url: string, key: string = null) {
     return function (target: HttpService, propertyKey: string, descriptor: any) {
+
+      // const originalMethod = descriptor.value;
+
       const pPath = target[`${propertyKey}_Path_parameters`],
         pQuery = target[`${propertyKey}_Query_parameters`],
         pBody = target[`${propertyKey}_Body_parameters`],
@@ -16,7 +19,7 @@ export function methodBuilder(method: string) {
 
       descriptor.value = function (...args: any[]) {
         const body: string = createBody(pBody, descriptor, args);
-        const resUrl: string = createPath(url ? url : AppConstants.apiEndpoints[key], pPath, args);
+        const resUrl: string = createPath(url ? url : AppConfig.apiEndpoints[key], pPath, args);
         const headers: HttpHeaders = createHeaders(pHeader, descriptor, this.getDefaultHeaders(), args);
         const criteriaParams: HttpParams | boolean = createHttpParamsFromCriteria(pCriteria, args);
         const params: HttpParams = createHttpParamsFromQuery(criteriaParams instanceof HttpParams ? criteriaParams : new HttpParams(), pQuery, args);
@@ -40,6 +43,19 @@ export function methodBuilder(method: string) {
 
         // intercept the response
         observable = this.responseInterceptor(observable, descriptor.adapter);
+
+        // ✅ run actual method code with its original arguments
+        //const originalResult = originalMethod.apply(this, args);
+
+        // if actual method returned something, merge it with observable
+        // if (originalResult) {
+        //   observable = observable.pipe(
+        //     switchMap((response) => {
+        //       // you decide whether to prefer originalResult or response
+        //       return of(originalResult ?? response);
+        //     })
+        //   );
+        // }
 
         return observable;
       };

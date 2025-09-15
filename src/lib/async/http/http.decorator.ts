@@ -1,5 +1,5 @@
 import { HttpService, MediaType } from './http.service';
-import { methodBuilder, paramBuilder } from './utils.service';
+import { methodBuilder, paramBuilder } from './utils';
 
 /* *********************************************
  * Class decorators

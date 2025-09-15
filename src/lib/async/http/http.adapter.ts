@@ -1,8 +1,8 @@
 import { HttpResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { extractContent, convertObjectKeysToCamel, convertObjectKeysToSnake } from '../../services/utils/helpers';
-import { AppConstants } from '../../app-constants';
+import { extractContent, ObjectUtils } from '../../utils';
+import { AppConfig } from '../../app-config';
 
 export class HttpAdapter {
   static baseAdapter(response: HttpResponse<any>, adapterFn?: Function): any {
@@ -16,24 +16,25 @@ export class HttpAdapter {
       }
     }
 
-    if (AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
+    if (AppConfig.defaultHttpSuccessCodes.hasOwnProperty(status)) {
       return extractContent(body).pipe(
         mergeMap((json) => {
           let result: any = null;
           let data = json === '' ? null : JSON.parse(json);
 
           // If Adaptor function provided call that, otherwise return result data
+          // Adaptor func will get original response from API
           result = adapterFn ? adapterFn.call(undefined, data) : data;
 
           // check response keys conversion settings
-          if (AppConstants.convertResponseObjectKeysToCamel) {
-            result = HttpAdapter.convertResponseObjectKeysToCamel(result);
+          if (AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP) {
+            result = ObjectUtils.convertObjectKeys(result, AppConfig.keysFormatAPI, AppConfig.keysFormatAPP);
           }
 
           return of(result);
         })
       );
-    } else if (!AppConstants.defaultHttpSuccessCodes.hasOwnProperty(status)) {
+    } else if (!AppConfig.defaultHttpSuccessCodes.hasOwnProperty(status)) {
       return extractContent(body).pipe(
         mergeMap((json) => {
           return throwException('An unexpected server error occurred.', status, json, headers);
@@ -42,10 +43,6 @@ export class HttpAdapter {
     }
 
     return of<any>(<any>null);
-  }
-
-  static convertResponseObjectKeysToCamel(response: any) {
-    return Object.assign({}, convertObjectKeysToCamel(response));
   }
 }
 

@@ -3,8 +3,8 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { mergeMap, catchError } from 'rxjs/operators';
 import { HttpAdapter } from './http.adapter';
-import { AppConstants } from '../../app-constants';
-import { convertObjectKeysToSnake, isObject } from '../../services';
+import { AppConfig } from '../../app-config';
+import { ObjectUtils } from '../../utils';
 
 /**
  * Supported @Produces media types
@@ -19,22 +19,11 @@ export class HttpService {
   public constructor(protected http: HttpClient) {}
 
   protected getBaseUrl(): string {
-    return AppConstants.remoteServiceBaseUrl;
+    return AppConfig.remoteServiceBaseUrl;
   }
 
   protected getDefaultHeaders(): Object {
     return null;
-  }
-
-  protected convertRequestBodyObjectKeysToSnake(object: any) {
-    // If it is object, stringy to get rid of object functions etc
-    // If not object, means it is already stringfied, no need to do it again, it will result in error
-    // then JSON.parse to get simple JSON object
-    if (isObject(object)) {
-      object = JSON.stringify(object);
-    }
-
-    return Object.assign({}, convertObjectKeysToSnake(JSON.parse(object)));
   }
 
   /**
@@ -44,8 +33,9 @@ export class HttpService {
    * @param {Request} req - request object
    */
   protected requestInterceptor(requestOptions: any) {
-    if (AppConstants.convertRequestObjectKeysToSnake) {
-      requestOptions.body = this.convertRequestBodyObjectKeysToSnake(requestOptions.body);
+    //check response keys conversion settings
+    if (AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP) {
+      requestOptions.body = ObjectUtils.convertObjectKeys(requestOptions.body, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI);
     }
 
     return requestOptions;

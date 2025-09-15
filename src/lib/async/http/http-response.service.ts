@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AppConstants } from '../../app-constants';
-import { MessageService, NotifyService, LogService, extractContent, isArray } from '../../services';
+import { AppConfig } from '../../app-config';
+import { MessageService, NotifyService, LogService } from '../../services';
+import { extractContent, isArray } from '../../utils';
 import { IErrorInfo, ICartesianResponse } from './types';
-import { HttpNotificationService } from './http-notification.service';
+import { HttpErrorService } from './http-error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,9 @@ export class HttpResponseService {
     private _messageService: MessageService,
     private _notifySertvice: NotifyService,
     private _logService: LogService,
-    private _errorService: HttpNotificationService
+    private _errorService: HttpErrorService
   ) {
-    this._notifier = AppConstants.interceptor.error.presenter === 'message' ? _messageService : _notifySertvice;
+    this._notifier = AppConfig.interceptor.error.presenter === 'message' ? _messageService : _notifySertvice;
   }
 
   _notifier: MessageService | NotifyService;
@@ -46,12 +47,20 @@ export class HttpResponseService {
     details: 'Server is not responding, try again after sometime.'
   };
 
+  mergeError(error: IErrorInfo, append?: IErrorInfo) {
+    if(!append)
+      return error;
+
+    error.details +=  '<br>' + append.details;
+    return error;
+  }
+
   logError(error: IErrorInfo): void {
     this._logService.error(error);
   }
 
   getErrorInfoFromCode(code): IErrorInfo {
-    return AppConstants.defaultHttpErrorCodes[code];
+    return AppConfig.defaultHttpErrorCodes[code];
   }
 
   showError(error: IErrorInfo): any {
@@ -81,26 +90,37 @@ export class HttpResponseService {
     }
   }
 
-  handleErrorResponse(response: HttpResponse<any>) {
+  handleErrorResponse(response: HttpResponse<any>, errorInfo: IErrorInfo = null, redirectUrl?: string) {
     const self = this;
-
+    let error: IErrorInfo;
+  
     switch (response.status) {
       case 401:
-        self.handleUnAuthorizedResponse(self.showError(self.defaultError401), '/');
+        error = self.mergeError(self.defaultError401, errorInfo);
         break;
       case 403:
-        self.showError(self.defaultError403);
+        error = self.mergeError(self.defaultError403, errorInfo);
         break;
       case 404:
-        self.showError(self.defaultError404);
+        error = self.mergeError(self.defaultError404, errorInfo);
         break;
       case 504:
-        self.showError(self.defaultError504);
+        error = self.mergeError(self.defaultError504, errorInfo);
         break;
       default:
-        const errorInfo: IErrorInfo = self.getErrorInfoFromCode(response.status) ?? self.defaultError;
-        self.showError(errorInfo);
+        if(!errorInfo) {
+          error = self.getErrorInfoFromCode(response.status) ?? self.defaultError;
+        } else {
+          error = errorInfo;
+        }
         break;
+    }
+
+    if(response.status === 401) {
+      self.handleUnAuthorizedResponse(error, redirectUrl ?? '/');
+    } else {
+      this.logError(error);
+      self.showError(error);
     }
   }
 
@@ -130,31 +150,37 @@ export class HttpResponseService {
     let cloneResponse: HttpResponse<any>;
 
     if ((cartesianResponse.data == null || cartesianResponse.data == undefined) && cartesianResponse.message) {
-      const error: IErrorInfo = this.defaultError;
       const { errors, message } = cartesianResponse;
+      const error: IErrorInfo = this.defaultError;
+      const details: string[] = [];
+    
       if (message) {
-        error.message = message;
+        details.push(message);
       }
+
       if (errors) {
+        // Dispatch ERRORS to caught by service obervers
+        this._errorService.dispatch(errors);
+
         const summary = Object.keys(errors).reduce(function (res, v) {
           if (isArray(errors[v])) {
             res = res.concat(errors[v] as string[]);
           } else res.push(errors[v] as string);
           return res;
         }, [] as string[]);
-        error.details = summary.join('<br/>');
+        details.concat(summary);
       }
+
+      if(details.length) {
+        error.details = details.join('<br>');
+      }
+
       cloneResponse = response.clone({
         body: { errors: errors, message: message }
       });
 
-      this._errorService.dispatch(errors);
-      this.logError(error);
-      this.showError(error);
+      this.handleErrorResponse(cloneResponse, error, cartesianResponse?.__redirectUrl);
 
-      if (response.status === 401) {
-        this.handleUnAuthorizedResponse(null, cartesianResponse?.__redirectUrl);
-      }
     } else {
       const { data, meta, ...rest } = cartesianResponse;
       cloneResponse = response.clone({
