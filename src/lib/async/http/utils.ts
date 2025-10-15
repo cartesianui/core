@@ -2,7 +2,6 @@ import { HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, switchMap, of } from 'rxjs';
 import { AppConfig } from '../../app-config';
 import { HttpService } from './http.service';
-import { RequestCriteria } from './http.criteria';
 import { isObject } from '../../utils';
 
 export function methodBuilder(method: string) {
@@ -124,11 +123,19 @@ function createHttpParamsFromQuery(params: HttpParams, pQuery: any, args: Array<
   return params;
 }
 
-function createHttpParamsFromCriteria(pCriteria: RequestCriteria, args: Array<any>): HttpParams | boolean {
-  if (pCriteria && pCriteria[0] && args[pCriteria[0].parameterIndex] && args[pCriteria[0].parameterIndex] instanceof RequestCriteria) {
-    const criteria = args[pCriteria[0].parameterIndex].toString();
-    const httpParams = new HttpParams({ fromString: criteria });
-    return httpParams;
+
+function createHttpParamsFromCriteria(pCriteria: unknown, args: any[]): HttpParams | boolean {
+  const param = pCriteria?.[0];
+  const arg = param ? args[param.parameterIndex] : null;
+
+  if (arg instanceof HttpParams) {
+    return arg;
+  }
+
+  if (arg && typeof arg.toString === 'function') {
+    // If it can be converted to string, e.g., RequestCriteria or query string
+    const criteria = arg.toString();
+    return new HttpParams({ fromString: criteria });
   }
 
   return false;

@@ -1,5 +1,5 @@
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { RequestCriteria } from './http.criteria';
 
 export type Operator = string;
 
@@ -53,6 +53,9 @@ export type Pairs = {
   searchJoin?: string;
 } & { [key: string]: Pairs[keyof Pairs] };
 
+
+export type RequestCriteriaOuput = HttpParams;
+
 // Request Errors
 export type IError = {
   [key: string]: Array<string> | string;
@@ -78,7 +81,7 @@ export type ICartesianResponse = {
 };
 
 export type IHttpService<TModel> = {
-  getAll?: (criteria: RequestCriteria) => Observable<ICartesianResponse>;
+  getAll?: (criteria: RequestCriteriaOuput) => Observable<ICartesianResponse>;
   getById?: (id: string) => Observable<ICartesianResponse>;
   create?: (model: TModel) => Observable<ICartesianResponse>;
   update?: (id: string, changes: Partial<TModel>) => Observable<ICartesianResponse>;

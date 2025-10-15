@@ -4,5 +4,6 @@ export * from './http-response.service';
 export * from './http.service';
 export * from './http.module';
 export * from './http.decorator';
-export * from './http.criteria';
+export * from './http-criteria.service';
+export * from './http-criteria-factory.service';
 export * from './http.interceptor'
