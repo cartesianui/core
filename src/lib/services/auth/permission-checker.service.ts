@@ -17,4 +17,12 @@ export class PermissionCheckerService {
   areAllGranted(permissions: string[]): boolean {
     return cartesian.auth.areAllGranted(...permissions);
   }
+
+  getAllPermissions(): {[name: string]: boolean} {
+    return cartesian.auth.allPermissions;
+  }
+
+  getGrantedPermissions(): {[name: string]: boolean} {
+    return cartesian.auth.grantedPermissions;
+  }
 }
