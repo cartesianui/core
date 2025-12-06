@@ -1,10 +1,10 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
+﻿
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from '../auth/token.service';
-import { convertObjectKeysToCamel } from '../utils/helpers';
-import { AppConstants } from '../../app-constants';
+import { convertObjectKeysToCamel } from '../../utils/helpers';
+import { AppConfig } from '../../app-config';
 
 type IAuthUser = {
   [key: string]: string;
@@ -37,7 +37,7 @@ export class SessionService {
     }
 
     return new Promise<IAuthUser | boolean>((resolve) => {
-      this.httpClient.get<any>(AppConstants.remoteServiceBaseUrl + AppConstants.apiEndpoints.authenticatedUser, { headers: requestHeaders }).subscribe({
+      this.httpClient.get<any>(AppConfig.remoteServiceBaseUrl + AppConfig.apiEndpoints.authenticatedUser, { headers: requestHeaders }).subscribe({
         next: (result: any) => {
           this._user = convertObjectKeysToCamel(result.data) as IAuthUser;
           resolve(this._user);

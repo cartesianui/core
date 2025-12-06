@@ -2,7 +2,7 @@ import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
 import { switchMap, filter, take, catchError, map } from 'rxjs/operators';
-import { AppConstants } from '../../app-constants';
+import { AppConfig } from '../../app-config';
 import { TokenService, RefreshTokenService, UtilsService } from '../../services';
 import { HttpResponseService } from './http-response.service';
 
@@ -121,7 +121,7 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
     let headerAttribute = cartesian.tenancy.headerAttribute;
-    let tenancyConfiguration = AppConstants.interceptor.tenancy;
+    let tenancyConfiguration = AppConfig.interceptor.tenancy;
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
       if (tenancyConfiguration !== undefined && tenancyConfiguration.overwriteHeaderAttribute) {
@@ -135,7 +135,7 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
   }
 
   protected addCustomHeaders(headers: HttpHeaders): HttpHeaders {
-    let customHeaders = AppConstants.interceptor.headers;
+    let customHeaders = AppConfig.interceptor.headers;
 
     if (headers) {
       if (customHeaders !== undefined) {

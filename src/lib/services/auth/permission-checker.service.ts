@@ -1,4 +1,4 @@
-﻿///<reference path="../../../../../../node_modules/@cartesianui/js/cartesian.d.ts"/>
+﻿
 
 import { Injectable } from '@angular/core';
 
@@ -16,5 +16,13 @@ export class PermissionCheckerService {
 
   areAllGranted(permissions: string[]): boolean {
     return cartesian.auth.areAllGranted(...permissions);
+  }
+
+  getAllPermissions(): {[name: string]: boolean} {
+    return cartesian.auth.allPermissions;
+  }
+
+  getGrantedPermissions(): {[name: string]: boolean} {
+    return cartesian.auth.grantedPermissions;
   }
 }

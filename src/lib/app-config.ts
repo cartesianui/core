@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IErrorInfo } from './index';
+import { IErrorInfo, KeyFormats} from './index';
 
 export type IInterceptorConfig = {
   error: {
@@ -22,7 +22,7 @@ export type ApiEndpoints = {
 @Injectable({
   providedIn: 'root'
 })
-export class AppConstants {
+export class AppConfig {
   static remoteServiceBaseUrl = '';
 
   static apiEndpoints: ApiEndpoints = {
@@ -53,7 +53,7 @@ export class AppConstants {
   };
 
   static readonly localization = {
-    defaultLocalizationSourceName: '' // AppConstants
+    defaultLocalizationSourceName: '' // AppConfig
   };
 
   static readonly authorization = {
@@ -124,7 +124,7 @@ export class AppConstants {
     '511': { code: 511, message: 'Network Authentication Required', details: '' }
   };
 
-  static convertResponseObjectKeysToCamel = true;
+  static keysFormatAPI: KeyFormats;
 
-  static convertRequestObjectKeysToSnake = true;
+  static keysFormatAPP: KeyFormats;
 }
