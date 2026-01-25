@@ -102,6 +102,17 @@ export function Adapter(adapterFn: Function) {
   };
 }
 
+/**
+ * Marks the response as a blob (for PDFs, images, etc.)
+ * Bypasses JSON parsing and adapter
+ */
+export function BlobResponse() {
+  return function (target: HttpService, propertyKey: string, descriptor: any) {
+    descriptor.isBlobResponse = true;
+    return descriptor;
+  };
+}
+
 /* *********************************************
  * Parameter decorators
  * *********************************************/
@@ -110,7 +121,7 @@ export function Adapter(adapterFn: Function) {
  * Path variable of a method's url, type: string
  * @param {string} key - path key to bind value
  */
-export var Path = paramBuilder('Path');
+export const Path = paramBuilder('Path');
 /**
  * Query value of a method's url, type: string
  * @param {string} key - query key to bind value

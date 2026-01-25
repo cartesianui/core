@@ -80,10 +80,22 @@ export type ICartesianResponse = {
   __cartesian?: boolean;
 };
 
-export type IHttpService<TModel> = {
+export type HttpServiceExtendedFunction =
+  (...args: unknown[]) => Observable<ICartesianResponse>;
+
+export type IHttpServiceExtension =
+  Record<string, HttpServiceExtendedFunction>;
+
+export type IHttpService<
+  TModel,
+  THttpServiceExtension  extends IHttpServiceExtension = {}
+> = {
   getAll?: (criteria: RequestCriteriaOuput) => Observable<ICartesianResponse>;
   getById?: (id: string) => Observable<ICartesianResponse>;
   create?: (model: TModel) => Observable<ICartesianResponse>;
-  update?: (id: string, changes: Partial<TModel>) => Observable<ICartesianResponse>;
+  update?: (
+    id: string,
+    changes: Partial<TModel>
+  ) => Observable<ICartesianResponse>;
   delete?: (id: string) => Observable<ICartesianResponse>;
-};
+} & THttpServiceExtension;

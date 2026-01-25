@@ -26,7 +26,7 @@ export function methodBuilder(method: string) {
         let options: any = {
           body: body,
           observe: 'response',
-          responseType: 'blob',
+          responseType: descriptor.isBlobResponse ? 'blob' : 'json',
           headers: headers
         };
 
@@ -40,7 +40,17 @@ export function methodBuilder(method: string) {
         // make the request and store the observable for later transformation
         let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options);
 
-        // intercept the response
+        // For blob responses, skip the adapter/interceptor and return the blob directly
+        if (descriptor.isBlobResponse) {
+          // Return the blob from the response body
+          return observable.pipe(
+            switchMap((response: HttpResponse<Blob>) => {
+              return of(response.body);
+            })
+          );
+        }
+
+        // intercept the response for JSON responses
         observable = this.responseInterceptor(observable, descriptor.adapter);
 
         // ✅ run actual method code with its original arguments
