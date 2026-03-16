@@ -91,7 +91,7 @@ export type IHttpService<
   THttpServiceExtension  extends IHttpServiceExtension = {}
 > = {
   getAll?: (criteria: RequestCriteriaOuput) => Observable<ICartesianResponse>;
-  getById?: (id: string) => Observable<ICartesianResponse>;
+  getById?: (id: string, includes?: string) => Observable<ICartesianResponse>;
   create?: (model: TModel) => Observable<ICartesianResponse>;
   update?: (
     id: string,
