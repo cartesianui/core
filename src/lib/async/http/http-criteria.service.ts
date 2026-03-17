@@ -1,6 +1,8 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { signal, computed } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { toCamel, isString } from '../../utils/helpers';
+import { AppConfig } from '../../app-config';
+import { ObjectUtils } from '../../utils/object.utils';
 import { WhereItem, WhereOptions, OrderItem, Operator, Value, OrderDirection, Column, ColumnItem, Comparison, Fields, SearchForm, Pairs } from './types';
 
 // @Injectable()
@@ -14,7 +16,7 @@ export class RequestCriteria {
   readonly limitPerPage = signal<number>(30);
   readonly pageNo = signal<number>(1);
   readonly searchJoinComparison = signal<Comparison>('and');
-  readonly operators = ['=', 'like'];
+  readonly operators = ['=', 'like', 'between', 'in'];
 
   constructor(form?: SearchForm) {
     if (form) this.form.set(form);
@@ -33,15 +35,25 @@ export class RequestCriteria {
   }
   
   where(column: string | Column, operator: Operator | Value = null, value: Value = null, options?: WhereOptions) {
-    if (Array.isArray(column)) return this.whereArray(column);
+    if (Array.isArray(column) && !isString(column[0])) return this.whereArray(column as Column);
 
     const [resolvedValue, resolvedOperator] = this.resolveOperatorValue(value, operator, arguments.length === 2);
     const finalOperator = this.operators.includes(resolvedOperator) ? resolvedOperator : '=';
 
     const updated = this.wheres().filter((w) => w.column !== column);
-    updated.push({ column, operator: finalOperator, value: resolvedValue, options });
+    if (resolvedValue !== null && resolvedValue !== '') {
+      updated.push({ column: column as string, operator: finalOperator, value: resolvedValue, options });
+    }
     this.wheres.set(updated);
     return this;
+  }
+
+  whereBetween(column: string, range: [Value, Value], options?: WhereOptions) {
+    return this.where(column, 'between', range as any, options);
+  }
+
+  whereIn(column: string, values: Value[], options?: WhereOptions) {
+    return this.where(column, 'in', values as any, options);
   }
 
   whereArray(column: Column) {
@@ -70,6 +82,18 @@ export class RequestCriteria {
     return this.orderBy(column, 'desc');
   }
 
+  /**
+   * Order by a related table's column.
+   * Generates: orderBy=relation|column (API joins the relation table)
+   * @example orderByRelation('posts', 'title', 'desc')
+   *          → ?orderBy=posts|title&sortedBy=desc
+   * @example orderByRelation('posts:custom_id', 'title')
+   *          → ?orderBy=posts:custom_id|title&sortedBy=asc
+   */
+  orderByRelation(relation: string, column: string, direction: OrderDirection = 'asc') {
+    return this.orderBy(`${relation}|${column}`, direction);
+  }
+
   page(page: number) {
     this.pageNo.set(page);
     return this;
@@ -89,6 +113,47 @@ export class RequestCriteria {
     });
 
     this.applyFormUpdates(entries);
+  }
+
+  /**
+   * Hydrate wheres from URL query params (search + searchFields).
+   * Parses: search=name:John;status:active  searchFields=name:like;status:=
+   * Converts API-format keys back to app-format (e.g. snake_case → camelCase).
+   */
+  hydrateFromUrl(params: Record<string, string>): void {
+    const searchStr = params['search'];
+    if (!searchStr) return;
+
+    const searchFieldsStr = params['searchFields'] || '';
+    const needsConvert = AppConfig.keysFormatAPI && AppConfig.keysFormatAPP && AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP;
+
+    // Parse searchFields into a map: { column: operator }
+    const operatorMap: Record<string, string> = {};
+    if (searchFieldsStr) {
+      searchFieldsStr.split(';').forEach(part => {
+        const [col, op] = part.split(':');
+        if (col && op) operatorMap[col.trim()] = op.trim();
+      });
+    }
+
+    // Parse search into wheres
+    const wheres: WhereItem[] = [];
+    searchStr.split(';').forEach(part => {
+      const idx = part.indexOf(':');
+      if (idx === -1) return;
+      const apiCol = part.substring(0, idx).trim();
+      const val = part.substring(idx + 1).trim();
+      if (!apiCol || !val) return;
+
+      const appCol = needsConvert ? ObjectUtils.convertKey(apiCol, AppConfig.keysFormatAPI, AppConfig.keysFormatAPP) : apiCol;
+      const operator = operatorMap[apiCol] || '=';
+
+      wheres.push({ column: appCol, operator, value: val });
+    });
+
+    if (wheres.length) {
+      this.wheres.set(wheres);
+    }
   }
 
   updateForm(fields: string | string[], value: string): this {
@@ -121,13 +186,19 @@ export class RequestCriteria {
     const orderBy: string[] = [];
     const sortedBy: string[] = [];
 
+    const needsConvert = AppConfig.keysFormatAPI && AppConfig.keysFormatAPP && AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP;
+
     this.wheres().forEach((condition) => {
-      search.push(`${condition.column}:${condition.value}`);
-      searchFields.push(`${condition.column}:${condition.operator}`);
+      const col = needsConvert ? ObjectUtils.convertKey(condition.column, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI) : condition.column;
+      // For 'between' and 'in' operators, values are arrays joined by comma
+      const val = Array.isArray(condition.value) ? condition.value.join(',') : condition.value;
+      search.push(`${col}:${val}`);
+      searchFields.push(`${col}:${condition.operator}`);
     });
 
     this.orders().forEach((order) => {
-      orderBy.push(order.column);
+      const col = needsConvert ? ObjectUtils.convertKey(order.column, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI) : order.column;
+      orderBy.push(col);
       sortedBy.push(order.direction);
     });
 
@@ -160,7 +231,7 @@ export class RequestCriteria {
   }
 
   private toHttpParams(): HttpParams {
-    return new HttpParams({ fromString: this.toQueryString() });
+    return new HttpParams({ fromObject: this.pairs() as Record<string, string> });
   }
 
   private toUrlParams(): string {

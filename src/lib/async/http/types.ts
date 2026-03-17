@@ -33,6 +33,7 @@ export type Fields = {
   orderBy: string[];
   sortedBy: string[];
   with: string[];
+  include: string[];
   filter: string[];
   page: number[];
   limit: number[];
@@ -47,6 +48,7 @@ export type Pairs = {
   orderBy?: string;
   sortedBy?: string;
   with?: string;
+  include?: string;
   filter?: string;
   page?: string;
   limit?: string;
