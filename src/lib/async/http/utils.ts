@@ -154,6 +154,11 @@ function createHttpParamsFromCriteria(pCriteria: unknown, args: any[]): HttpPara
 function createHeaders(pHeader: any, descriptor: any, defaultHeaders: any, args: Array<any>): HttpHeaders {
   let httpHeaders = new HttpHeaders(defaultHeaders);
 
+  // For FormData uploads, remove Content-Type so browser sets multipart/form-data with boundary
+  if (descriptor.isFormData) {
+    httpHeaders = httpHeaders.delete('Content-Type');
+  }
+
   // set method specific headers
   for (var k in descriptor.headers) {
     if (descriptor.headers.hasOwnProperty(k)) {

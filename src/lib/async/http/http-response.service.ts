@@ -49,10 +49,12 @@ export class HttpResponseService {
 
   mergeError(error: IErrorInfo, append?: IErrorInfo) {
     if(!append)
-      return error;
+      return { ...error };
 
-    error.details +=  '<br>' + append.details;
-    return error;
+    return {
+      ...error,
+      details: error.details + '<br>' + append.details
+    };
   }
 
   logError(error: IErrorInfo): void {

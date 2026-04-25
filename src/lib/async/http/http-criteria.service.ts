@@ -202,13 +202,21 @@ export class RequestCriteria {
       sortedBy.push(order.direction);
     });
 
+    const relations = needsConvert
+      ? this.relations().map(r =>
+          r.split(',').map(path =>
+            path.split('.').map(seg => ObjectUtils.convertKey(seg, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI)).join('.')
+          ).join(',')
+        )
+      : this.relations();
+
     return {
       search,
       searchFields,
       orderBy,
       sortedBy,
-      with: this.relations(),
-      include: this.relations(),
+      with: relations,
+      include: relations,
       filter: this.filters(),
       page: [this.pageNo()],
       limit: [this.limitPerPage()],

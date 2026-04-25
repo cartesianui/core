@@ -34,7 +34,8 @@ export class HttpService {
    */
   protected requestInterceptor(requestOptions: any) {
     //check response keys conversion settings
-    if (AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP) {
+    // TODO: Revisit this check - any other approach
+    if (AppConfig.keysFormatAPI !== AppConfig.keysFormatAPP && !(requestOptions.body instanceof FormData)) {
       requestOptions.body = ObjectUtils.convertObjectKeys(requestOptions.body, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI);
     }
 
