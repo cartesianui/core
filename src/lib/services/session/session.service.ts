@@ -53,12 +53,67 @@ export class SessionService {
     return this._user;
   }
 
+  /**
+   * Authenticated user id. Prefers `cartesian.session.userId` (populated
+   * by `UserConfigurationProcessor::preServe` on the configuration bundle)
+   * with fallback to the legacy `/v1/profile` payload.
+   */
   get userId(): string {
-    return this.user ? this.user.id : null;
+    return cartesian.session?.userId?.toString() ?? this._user?.id ?? null;
+  }
+
+  /** Current tenant id (from `TenantConfigurationProcessor::preServe`). */
+  get tenantId(): string | null {
+    return cartesian.session?.tenantId?.toString() ?? null;
+  }
+
+  /** Current domain id (from `DomainConfigurationProcessor::preServe`). */
+  get domainId(): string | null {
+    return cartesian.session?.domainId?.toString() ?? null;
+  }
+
+  /** True when running inside the host tenant context. */
+  get isHost(): boolean {
+    return !!cartesian.session?.isHost;
+  }
+
+  /** True when the authenticated user has the admin role. */
+  get isAdmin(): boolean {
+    return !!cartesian.session?.isAdmin;
+  }
+
+  /** Numeric tenancy context code (1=TENANT, 2=HOST). */
+  get context(): number | null {
+    return cartesian.session?.context ?? null;
   }
 
   getShownLoginName(): string {
     return this._user.name ?? this._user.email;
+  }
+
+  /**
+   * Authenticated user's image URL (HasImage `original` variant).
+   * Populated by `UserConfigurationProcessor::preServe` and merged into
+   * the `cartesian` global at app boot via `getConfigurations()`.
+   * Falls back to null when the user has no image.
+   */
+  get imageUrl(): string | null {
+    return (cartesian as any).profile?.imageUrl ?? null;
+  }
+
+  /** Thumbnail variant URL, or original if no thumb exists. */
+  get thumbnailUrl(): string | null {
+    return (cartesian as any).profile?.thumbnailUrl ?? this.imageUrl;
+  }
+
+  /** Display name from the configuration profile block. */
+  get profileName(): string | null {
+    return (cartesian as any).profile?.name ?? null;
+  }
+
+  /** Email from the configuration profile block. */
+  get profileEmail(): string | null {
+    return (cartesian as any).profile?.email ?? null;
   }
 
   get isHostSide(): boolean {
