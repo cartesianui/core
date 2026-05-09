@@ -126,7 +126,13 @@ function createHttpParamsFromQuery(params: HttpParams, pQuery: any, args: Array<
         if (value instanceof Object) {
           value = JSON.stringify(value);
         }
-        params = params.append(encodeURIComponent(key), encodeURIComponent(value));
+        // HttpParams.append runs values through Angular's HttpUrlEncodingCodec
+        // which encodes everything outside the URL `pchar` set. Pre-encoding
+        // here with encodeURIComponent caused a silent double-encode: a `,`
+        // would become `%2C` then `%252C` on the wire, making Spatie's
+        // `?include=foo,bar` parser see one literal include name. Pass the
+        // raw value through and let HttpParams encode once.
+        params = params.append(key, value);
       });
   }
 
