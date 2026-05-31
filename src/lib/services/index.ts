@@ -3,6 +3,7 @@ export * from './auth/refresh-token.service'
 export * from './auth/permission-checker.service';
 export * from './features/feature-checker.service';
 export * from './localization/localization.service';
+export * from './regional/regional.service';
 export * from './log/log.service';
 export * from './message/message.service';
 export * from './tenancy/tenancy.service';

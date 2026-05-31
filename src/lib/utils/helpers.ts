@@ -109,6 +109,45 @@ export function convertObjectKeysToCamel(o) {
 }
 
 /**
+ * Recursively strip Fractal `{ data: ... }` envelopes from API responses.
+ *
+ * Apiato / League\Fractal wraps included relations as `{ "data": { ... } }`
+ * (single item) or `{ "data": [ ... ] }` (collection). For consumers that
+ * walk the tree to read nested values, having to remember the extra `data`
+ * hop at every relation boundary is fragile (see SelectableControlComponent
+ * + RN-item edit gate: `skuSelected().product.data.configuration.shopifier.hasBatches`
+ * vs the cleaner `skuSelected().product.configuration.shopifier.hasBatches`).
+ *
+ * This helper unwraps every node where the ONLY key is `data` and that
+ * key's value is an object or array — same rule the BE
+ * `LookupResponseMiddleware::unwrapFractal` applies on lookup-mode
+ * responses. Apply this on FE consumption paths that DON'T go through
+ * lookup-mode (e.g. find-by-id, find-by-criteria) so the post-conversion
+ * shape is consistent with lookup responses.
+ *
+ * Safe to call multiple times — re-walks idempotently.
+ */
+export function unwrapFractalData(o: any): any {
+  if (isArray(o)) {
+    return o.map((i) => unwrapFractalData(i));
+  }
+  if (isObject(o)) {
+    // Collapse the envelope: a node `{ data: <something> }` where `data`
+    // is the sole key becomes whatever's inside. Recurse into the result.
+    const keys = Object.keys(o);
+    if (keys.length === 1 && keys[0] === 'data' && (isObject(o['data']) || isArray(o['data']))) {
+      return unwrapFractalData(o['data']);
+    }
+    const n: any = {};
+    keys.forEach((k) => {
+      n[k] = unwrapFractalData(o[k]);
+    });
+    return n;
+  }
+  return o;
+}
+
+/**
  * Returns converted object (keys converted from camel to snake)
  *
  * @param val

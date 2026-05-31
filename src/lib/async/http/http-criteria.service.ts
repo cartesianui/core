@@ -16,6 +16,14 @@ export class RequestCriteria {
   readonly limitPerPage = signal<number>(30);
   readonly pageNo = signal<number>(1);
   readonly searchJoinComparison = signal<Comparison>('and');
+  /**
+   * Response mode flag. Today: `'lookup'` triggers the BE
+   * `LookupResponseMiddleware` (skip pagination, unwrap Fractal). Column
+   * selection in that mode still comes from `filter()` — the middleware
+   * reads the same `filter=` param the listing path uses. One column-
+   * selection mechanism, two response shapes.
+   */
+  readonly outputMode = signal<string | null>(null);
   readonly operators = ['=', 'like', 'between', 'in'];
 
   constructor(form?: SearchForm) {
@@ -70,6 +78,19 @@ export class RequestCriteria {
 
   searchJoin(comparison: Comparison) {
     this.searchJoinComparison.set(comparison);
+    return this;
+  }
+
+  /**
+   * Set the response-mode flag. Today `'lookup'` triggers the BE
+   * `LookupResponseMiddleware`. Pass `null` to clear.
+   *
+   * Column selection is decoupled — use `filter(cols)` for that on both
+   * normal listings and lookup-mode pickers. One column-selection API,
+   * two response shapes.
+   */
+  output(mode: string | null) {
+    this.outputMode.set(mode && mode.length ? mode : null);
     return this;
   }
 
@@ -210,18 +231,37 @@ export class RequestCriteria {
         )
       : this.relations();
 
-    return {
+    // Convert filter column names APP→API (camel→snake) so callers can pass
+    // FE-format keys. Same convention `wheres` and `orders` use. Without this,
+    // BE Prettus's `select($filter)` errored on camelCase columns AND the
+    // lookup-mode middleware's pluck loop returned null for every key that
+    // didn't match the raw row attributes.
+    const filters = needsConvert
+      ? this.filters().map((c) => ObjectUtils.convertKey(c, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI))
+      : this.filters();
+
+    const out: Fields = {
       search,
       searchFields,
       orderBy,
       sortedBy,
       with: relations,
       include: relations,
-      filter: this.filters(),
+      filter: filters,
       page: [this.pageNo()],
       limit: [this.limitPerPage()],
       searchJoin: [this.searchJoinComparison()]
     };
+
+    // Response-mode flag (e.g. `output=lookup` triggers LookupResponseMiddleware).
+    // Column selection in any mode is owned by `filter()` above — same wire
+    // shape, different response handling per `output`.
+    const mode = this.outputMode();
+    if (mode) {
+      out['output' as keyof Fields] = [mode] as any;
+    }
+
+    return out;
   }
 
   private toPairs(): Pairs {
