@@ -25,6 +25,12 @@ export type ApiEndpoints = {
 export class AppConfig {
   static remoteServiceBaseUrl = '';
 
+  /** Identifier for THIS Angular app — `'admin' | 'care' | 'pos' | 'talent'`.
+   *  Read from each app's `assets/appconfig.json` and used by the widget
+   *  registry (and any future per-app filtering) to know which surface is
+   *  asking for data. Empty string disables filtering. */
+  static appKey = '';
+
   static apiEndpoints: ApiEndpoints = {
     login: '/login',
     authenticatedUser: '/profile'
