@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { IErrorInfo, KeyFormats} from './index';
 
+// The `cartesian` global is populated by the BE default-bundle on app boot
+// (system-configuration blocks: `tenancy`, …). It's the FE side of the
+// BE single-source-of-truth for header names.
+declare const cartesian: any;
+
 export type IInterceptorConfig = {
   error: {
     show: Boolean;
@@ -24,6 +29,18 @@ export type ApiEndpoints = {
 })
 export class AppConfig {
   static remoteServiceBaseUrl = '';
+
+  /**
+   * Tenancy host header name. Single source = the BE config
+   * (`tenancy.configuration.tenancy.header_attribute`), emitted to the FE as
+   * `cartesian.tenancy.headerAttribute`. The literal here is only a pre-boot
+   * fallback (the tenancy header is needed for the very first request, before
+   * the default-bundle loads) and must match the BE default.
+   */
+  static get tenantHeaderAttribute(): string {
+    return (typeof cartesian !== 'undefined' && cartesian?.tenancy?.headerAttribute)
+      || 'X-Cartesian-Host';
+  }
 
   /** Identifier for THIS Angular app — `'admin' | 'care' | 'pos' | 'talent'`.
    *  Read from each app's `assets/appconfig.json` and used by the widget

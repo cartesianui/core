@@ -113,6 +113,21 @@ export function BlobResponse() {
   };
 }
 
+/**
+ * Marks the method as a streaming endpoint. The returned Observable emits the
+ * cumulative response text as it arrives (Angular download-progress events),
+ * then the final body — reusing the normal auth/tenant interceptors + base URL
+ * (no fetch). Bypasses JSON parsing + the response key-adapter, so the consumer
+ * parses chunks itself (e.g. NDJSON/SSE). Backward compatible: only affects
+ * methods that opt in with @Stream().
+ */
+export function Stream() {
+  return function (target: HttpService, propertyKey: string, descriptor: any) {
+    descriptor.isStream = true;
+    return descriptor;
+  };
+}
+
 /* *********************************************
  * Parameter decorators
  * *********************************************/

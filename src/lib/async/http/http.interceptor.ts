@@ -5,6 +5,7 @@ import { switchMap, filter, take, catchError, map } from 'rxjs/operators';
 import { AppConfig } from '../../app-config';
 import { TokenService, RefreshTokenService, UtilsService } from '../../services';
 import { HttpResponseService } from './http-response.service';
+import { HTTP_HEADER_CONTRIBUTORS } from './header-contributor';
 
 declare const cartesian: any;
 
@@ -86,6 +87,7 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
     modifiedHeaders = this.addAcceptLanguageHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantIdHeader(modifiedHeaders);
     modifiedHeaders = this.addTenantHostHeader(modifiedHeaders);
+    modifiedHeaders = this.addContributedHeaders(modifiedHeaders);
     modifiedHeaders = this.addCustomHeaders(modifiedHeaders);
 
     return request.clone({
@@ -120,7 +122,9 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
   }
 
   protected addTenantHostHeader(headers: HttpHeaders): HttpHeaders {
-    let headerAttribute = cartesian.tenancy.headerAttribute;
+    // Header name from AppConfig (BE single source via the emitted cartesian
+    // global), not a hardcoded literal.
+    let headerAttribute = AppConfig.tenantHeaderAttribute;
     let tenancyConfiguration = AppConfig.interceptor.tenancy;
 
     if (headerAttribute && headers && !headers.has(headerAttribute)) {
@@ -128,6 +132,31 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
         headers = headers.set(headerAttribute, tenancyConfiguration.host);
       } else {
         headers = headers.set(headerAttribute, this.getHostName());
+      }
+    }
+
+    return headers;
+  }
+
+  /**
+   * Merge headers from any registered HTTP_HEADER_CONTRIBUTORS. Feature libs
+   * register contributors to attach their own headers without the platform
+   * interceptor carrying any domain knowledge. Read lazily via the injector so
+   * apps that register no contributors are unaffected. Null/empty values are
+   * skipped and an already-present header is never overwritten.
+   */
+  protected addContributedHeaders(headers: HttpHeaders): HttpHeaders {
+    const contributors = this._injector.get(HTTP_HEADER_CONTRIBUTORS, null);
+    if (!contributors || !headers) {
+      return headers;
+    }
+    for (const contributor of contributors) {
+      const contributed = contributor?.headers?.() ?? {};
+      for (const key of Object.keys(contributed)) {
+        const value = contributed[key];
+        if (key && value && !headers.has(key)) {
+          headers = headers.set(key, value);
+        }
       }
     }
 

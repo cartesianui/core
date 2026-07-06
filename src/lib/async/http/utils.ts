@@ -1,5 +1,5 @@
-import { HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Observable, switchMap, of } from 'rxjs';
+import { HttpHeaders, HttpParams, HttpResponse, HttpEventType } from '@angular/common/http';
+import { Observable, switchMap, of, filter, map } from 'rxjs';
 import { AppConfig } from '../../app-config';
 import { HttpService } from './http.service';
 import { isObject } from '../../utils';
@@ -25,10 +25,16 @@ export function methodBuilder(method: string) {
 
         let options: any = {
           body: body,
-          observe: 'response',
-          responseType: descriptor.isBlobResponse ? 'blob' : 'json',
+          observe: descriptor.isStream ? 'events' : 'response',
+          responseType: descriptor.isBlobResponse ? 'blob' : (descriptor.isStream ? 'text' : 'json'),
           headers: headers
         };
+
+        // Stream: ask Angular to report download progress so we can surface
+        // partial text as it arrives.
+        if (descriptor.isStream) {
+          options.reportProgress = true;
+        }
 
         if (params && params instanceof HttpParams) {
           options.params = params;
@@ -39,6 +45,20 @@ export function methodBuilder(method: string) {
 
         // make the request and store the observable for later transformation
         let observable: Observable<HttpResponse<any>> = this.http.request(method, this.getBaseUrl() + resUrl, options);
+
+        // Streaming: emit cumulative text on each download-progress event, then
+        // the final body. Bypasses the JSON adapter — consumer parses chunks.
+        if (descriptor.isStream) {
+          return observable.pipe(
+            filter(
+              (event: any) =>
+                event && (event.type === HttpEventType.DownloadProgress || event.type === HttpEventType.Response)
+            ),
+            map((event: any) =>
+              event.type === HttpEventType.Response ? (event.body ?? '') : (event.partialText ?? '')
+            )
+          );
+        }
 
         // For blob responses, skip the adapter/interceptor and return the blob directly
         if (descriptor.isBlobResponse) {
