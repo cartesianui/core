@@ -211,8 +211,16 @@ export class RequestCriteria {
 
     this.wheres().forEach((condition) => {
       const col = needsConvert ? ObjectUtils.convertKey(condition.column, AppConfig.keysFormatAPP, AppConfig.keysFormatAPI) : condition.column;
-      // For 'between' and 'in' operators, values are arrays joined by comma
-      const val = Array.isArray(condition.value) ? condition.value.join(',') : condition.value;
+      // For 'between' and 'in' operators, values are arrays joined by comma.
+      // Booleans need '1'/'0', not the literal words "true"/"false" — a
+      // boolean DB column is a TINYINT, and MySQL's implicit string→number
+      // coercion turns the non-numeric string 'true' into 0, so
+      // `is_active = 'true'` actually matches INACTIVE rows.
+      const val = Array.isArray(condition.value)
+        ? condition.value.join(',')
+        : typeof condition.value === 'boolean'
+          ? (condition.value ? '1' : '0')
+          : condition.value;
       search.push(`${col}:${val}`);
       searchFields.push(`${col}:${condition.operator}`);
     });
