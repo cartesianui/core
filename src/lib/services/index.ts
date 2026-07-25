@@ -3,6 +3,8 @@ export * from './auth/refresh-token.service'
 export * from './auth/http-refresh-token.service';
 export * from './auth/permission-checker.service';
 export * from './features/feature-checker.service';
+export * from './entitlement/entitlements.service';
+export * from './entitlement/http.service';
 export * from './localization/localization.service';
 export * from './regional/regional.service';
 export * from './log/log.service';
