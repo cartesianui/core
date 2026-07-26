@@ -73,12 +73,35 @@ export class HttpResponseService {
     }
   }
 
-  redirect(redirectUrl: string): void {
-    if (!redirectUrl) {
-      // location.href = "/";
-    } else {
-      // location.href = redirectUrl;
+  /**
+   * sessionStorage key guarding against a reload loop: apps that bootstrap
+   * with an unconditional authenticated-user check (see SessionService.init)
+   * will hit this same 401 path again immediately after a hard redirect.
+   * location.pathname can't detect "already tried this" because several apps
+   * use HashLocationStrategy, where pathname is always '/' regardless of
+   * route. Cleared on the next successful response (see handleCartesianResponse).
+   */
+  private static readonly REDIRECT_ATTEMPTED_KEY = 'ct.auth.redirectAttempted';
+
+  private clearRedirectGuard(): void {
+    try {
+      sessionStorage.removeItem(HttpResponseService.REDIRECT_ATTEMPTED_KEY);
+    } catch {
+      // sessionStorage unavailable — nothing to clear.
     }
+  }
+
+  redirect(redirectUrl: string): void {
+    const target = redirectUrl || '/';
+    try {
+      if (sessionStorage.getItem(HttpResponseService.REDIRECT_ATTEMPTED_KEY) === target) {
+        return;
+      }
+      sessionStorage.setItem(HttpResponseService.REDIRECT_ATTEMPTED_KEY, target);
+    } catch {
+      // sessionStorage unavailable (private mode, etc.) — navigate anyway.
+    }
+    location.href = target;
   }
 
   handleUnAuthorizedResponse(messagePromise: any, redirectUrl?: string) {
@@ -119,7 +142,7 @@ export class HttpResponseService {
     }
 
     if(response.status === 401) {
-      self.handleUnAuthorizedResponse(error, redirectUrl ?? '/');
+      self.handleUnAuthorizedResponse(self.showError(error), redirectUrl ?? '/');
     } else {
       this.logError(error);
       self.showError(error);
@@ -184,6 +207,7 @@ export class HttpResponseService {
       this.handleErrorResponse(cloneResponse, error, cartesianResponse?.__redirectUrl);
 
     } else {
+      this.clearRedirectGuard();
       const { data, meta, ...rest } = cartesianResponse;
       cloneResponse = response.clone({
         body: { data: data, meta: meta, ...rest }
