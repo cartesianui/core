@@ -6,6 +6,7 @@ import { AppConfig } from '../../app-config';
 import { TokenService, RefreshTokenService, UtilsService } from '../../services';
 import { HttpResponseService } from './http-response.service';
 import { HTTP_HEADER_CONTRIBUTORS } from './header-contributor';
+import { SKIP_AUTH_REFRESH } from './http-context-tokens';
 
 declare const cartesian: any;
 
@@ -24,7 +25,9 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
     return next.handle(modifiedRequest).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse) {
-          if (error.status === 401) {
+          // A 401 on the refresh call itself must never re-enter the
+          // refresh flow — see SKIP_AUTH_REFRESH doc comment.
+          if (error.status === 401 && !request.context.get(SKIP_AUTH_REFRESH)) {
             return this.tryAuthWithRefreshToken(request, next, error);
           } else {
             return this.handleErrorResponse(error);
@@ -62,6 +65,18 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
             let modifiedRequest = this.normalizeRequestHeaders(request);
             return next.handle(modifiedRequest);
           } else {
+            // Wake up any requests parked below waiting on this same
+            // refresh attempt — otherwise they hang forever (filter()
+            // there only lets non-null values through, and this was the
+            // only place that could ever push one).
+            this.refreshTokenSubject.next(false);
+            // Definitively unauthenticated — both the access token and the
+            // refresh token are dead. Clear them so the next page load
+            // doesn't resend the same doomed token and repeat this whole
+            // cycle (extra error toast + redundant redirect attempt) on
+            // every subsequent reload.
+            this._tokenService.clearToken();
+            this._tokenService.clearRefreshToken();
             return this.handleErrorResponse(error);
           }
         })
@@ -71,6 +86,9 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
         filter((authResult) => authResult != null),
         take(1),
         switchMap((authResult) => {
+          if (!authResult) {
+            return this.handleErrorResponse(error);
+          }
           let modifiedRequest = this.normalizeRequestHeaders(request);
           return next.handle(modifiedRequest);
         })

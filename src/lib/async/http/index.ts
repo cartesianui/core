@@ -8,3 +8,4 @@ export * from './http-criteria.service';
 export * from './http-criteria-factory.service';
 export * from './http.interceptor'
 export * from './header-contributor';
+export * from './http-context-tokens';

@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AppConfig } from '../../app-config';
 import { convertObjectKeysToCamel } from '../../utils';
 import { RefreshTokenService } from './refresh-token.service';
 import { TokenService } from './token.service';
+import { SKIP_AUTH_REFRESH } from '../../async/http/http-context-tokens';
 
 /**
  * Default `RefreshTokenService`: calls the BE's cookie-based refresh endpoint
@@ -27,7 +28,9 @@ export class HttpRefreshTokenService extends RefreshTokenService {
   }
 
   tryAuthWithRefreshToken(): Observable<boolean> {
-    return this.http.post<any>(`${AppConfig.remoteServiceBaseUrl}${HttpRefreshTokenService.REFRESH_ENDPOINT}`, {}).pipe(
+    return this.http.post<any>(`${AppConfig.remoteServiceBaseUrl}${HttpRefreshTokenService.REFRESH_ENDPOINT}`, {}, {
+      context: new HttpContext().set(SKIP_AUTH_REFRESH, true),
+    }).pipe(
       map((response) => {
         const result = convertObjectKeysToCamel(response?.data ?? response);
         if (result?.accessToken) {
