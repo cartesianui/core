@@ -120,16 +120,36 @@ export class SessionService {
     return this._session.isHostSide();
   }
 
+  /**
+   * True for an admin operating in the HOST tenant context.
+   *
+   * RPH-026 (roles-permission-hardening): previously delegated to the legacy
+   * `cartesian.session.js` `isHostAdmin()`, which requires
+   * `session.hostId` — a field no backend configuration processor ever
+   * emits — so it evaluated `false` for everyone, including a real host
+   * admin. Now derived from the two session flags the backend actually
+   * sends (`is_host` from TenantConfigurationProcessor, `is_admin`).
+   */
   get isHostAdmin(): boolean {
-    return this._session.isHostAdmin();
+    return this.isHost && this.isAdmin;
   }
 
   get isTenantSide(): boolean {
     return this._session.isTenantSide();
   }
 
+  /**
+   * True for an admin of a NON-host tenant.
+   *
+   * RPH-026: the legacy delegate meant `tenantId && isAdmin`, which is also
+   * true for a host admin (the host has a tenant row like any other) — so it
+   * really answered "is an admin", not "is a tenant admin". Now excludes the
+   * host context, making it the complement of `isHostAdmin` among admins.
+   * Existing consumers all use `isHostAdmin || isTenantAdmin` (= isAdmin),
+   * which is unchanged by this fix.
+   */
   get isTenantAdmin(): boolean {
-    return this._session.isTenantAdmin();
+    return !this.isHost && this.isAdmin;
   }
 
   get isUserLogged(): boolean {
