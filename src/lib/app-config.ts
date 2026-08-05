@@ -53,6 +53,21 @@ export class AppConfig {
     authenticatedUser: '/profile'
   };
 
+  /**
+   * Cloudflare Turnstile. Only the SITE key belongs here — it is public by
+   * design and is rendered into the login form so the widget can identify
+   * itself. The secret key authenticates the server's verification call and
+   * must never reach a browser.
+   *
+   * Empty disables the widget, which is correct for an install that has not
+   * configured Turnstile. Whether a token is *required* is the server's
+   * decision (`user_management.captcha_on_login` /
+   * `captcha_on_registration`), not this flag's — the client always sends one
+   * when it can, because sending a token the server ignores costs nothing
+   * while omitting one it wants is a locked door.
+   */
+  static captcha: { siteKey: string } = { siteKey: '' };
+
   static appBaseUrl = '';
 
   static appBaseHref = ''; // returns angular's base-href parameter value if used during the publish
