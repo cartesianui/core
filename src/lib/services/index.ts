@@ -1,6 +1,7 @@
 export * from './auth/token.service';
 export * from './auth/refresh-token.service'
 export * from './auth/http-refresh-token.service';
+export * from './auth/auth-http.service';
 export * from './auth/permission-checker.service';
 export * from './features/feature-checker.service';
 export * from './entitlement/entitlements.service';

@@ -13,7 +13,7 @@ export interface UiLoaderOptions {
   cssClass?: string;
   /** URL for type='image'. */
   image?: string | null;
-  /** Icon-font class string for type='icon' (e.g. `'fa fa-circle-notch fa-spin fa-3x'`). */
+  /** Icon-font class string for type='icon' (e.g. `'fa-solid fa-circle-notch fa-spin fa-3x'`). */
   icon?: string | null;
   /** Text shown beneath the spinner. */
   text?: string;
