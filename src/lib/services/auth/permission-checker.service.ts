@@ -1,11 +1,36 @@
 ﻿
 
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PermissionCheckerService {
+  /**
+   * Bumped whenever the config bundle backing `cartesian.auth` is (re)loaded.
+   *
+   * The permission data itself lives on a plain global, so nothing reactive
+   * ever noticed it changing. That was fine while the only writer was the
+   * BLOCKING app initializer at bootstrap — but the initializer also runs
+   * AFTER a successful login, by which point the app has bootstrapped and the
+   * router is already navigating. The console layout filters its nav inside an
+   * `effect`, so with no signal to track it kept the pre-login (empty)
+   * permission set and showed a truncated menu until a manual page reload —
+   * where bootstrap-order made the assumption true again.
+   *
+   * Reading this signal inside the getters below is what lets those consumers
+   * re-run. See `refresh()`.
+   */
+  private readonly version = signal(0);
+
+  /**
+   * Tell permission consumers the underlying `cartesian.auth` data changed.
+   *
+   * Call after merging a freshly-fetched config bundle — notably post-login.
+   */
+  refresh(): void {
+    this.version.update((v) => v + 1);
+  }
   /**
    * Whether the current user holds `permissionName`.
    *
@@ -68,6 +93,10 @@ export class PermissionCheckerService {
    * permission gate would silently invert.
    */
   getGrantedPermissions(): string[] {
+    // Track `version` so reactive consumers (e.g. the console layout's nav
+    // filter effect) re-run when the bundle is reloaded — see `refresh()`.
+    this.version();
+
     return (cartesian.auth.grantedPermissions as unknown as string[]) ?? [];
   }
 
@@ -76,6 +105,8 @@ export class PermissionCheckerService {
    * @returns Array of role names
    */
   getAllAssignedRoles(): string[] {
+    this.version();
+
     return cartesian.auth.assignedRoles || [];
   }
 
