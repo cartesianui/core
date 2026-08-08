@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { EntitlementsHttpService } from './http.service';
+import { TokenService } from '../auth/token.service';
 
 /**
  * FE side of the BE entitlement gate (`Cartesian\Entitlement\EntitlementRegistry`
@@ -28,6 +29,7 @@ import { EntitlementsHttpService } from './http.service';
 @Injectable({ providedIn: 'root' })
 export class EntitlementsService {
   private httpService = inject(EntitlementsHttpService);
+  private tokenService = inject(TokenService);
 
   // "key" -> boolean gate value; "key.limitKey" -> numeric detail value.
   // Both stored as the raw string the BE sends ('true'/'false' or a number
@@ -37,11 +39,37 @@ export class EntitlementsService {
   /** True once the first response (success or failure) has landed. */
   readonly loaded = signal(false);
 
+  /**
+   * The last attempt failed. Kept separate from `loaded` because the two mean
+   * different things to `has()` — see the fail-open note there.
+   */
+  private readonly errored = signal(false);
+
   private requested = false;
 
-  /** Fetch once. Safe to call more than once — only the first call fires. */
+  /**
+   * Fetch once per authenticated session.
+   *
+   * Skips entirely when there is no token, WITHOUT marking the fetch as
+   * requested. The app initializer runs this on every boot — including on the
+   * login page, where the user is anonymous. That anonymous call 401'd, and
+   * the error handler used to mark the service `loaded` with no rows, which
+   * flipped `has()` from fail-open to fail-CLOSED for the rest of the page's
+   * life. Because `requested` was already latched, the post-login call was a
+   * no-op, so the nav stayed collapsed until a manual reload — where boot
+   * happened to run once, with a token.
+   *
+   * That is QA-N1: only Sales / Accounting / Admin visible after login. Those
+   * are exactly the three workspace sections with no `entitlements` gate; every
+   * other section was hidden by a `has()` that had silently gone fail-closed.
+   */
   load(): void {
     if (this.requested) return;
+
+    // Anonymous — nothing to fetch, and crucially nothing to latch. The next
+    // call (post-login, with a token) is the one that counts.
+    if (!this.tokenService.getToken()) return;
+
     this.requested = true;
 
     this.httpService.getMine().subscribe({
@@ -53,21 +81,39 @@ export class EntitlementsService {
           map[key] = row.value;
         }
         this.rows.set(map);
+        this.errored.set(false);
         this.loaded.set(true);
       },
       // Fail open — a load error must never hide nav the tenant is
       // actually entitled to; the BE gate is the real backstop.
-      error: () => this.loaded.set(true)
+      error: () => {
+        this.errored.set(true);
+        this.loaded.set(true);
+      }
     });
   }
 
   /**
+   * Force a re-fetch, e.g. after the user signs in and the token changes.
+   * `load()` alone latches on first call and would no-op.
+   */
+  reload(): void {
+    this.requested = false;
+    this.load();
+  }
+
+  /**
    * Whether the tenant's plan includes this entitlement key's boolean gate.
-   * Fails OPEN (true) until loaded, so nav doesn't flash-hide before the
-   * first response — see class doc.
+   *
+   * Fails OPEN (true) until loaded AND on a failed load, so nav neither
+   * flash-hides before the first response nor collapses because the request
+   * failed. The class doc always claimed the error case failed open; it did
+   * not — `loaded` was set on error while `rows` stayed empty, so every lookup
+   * returned false. The BE gate is the real enforcement, so open is the
+   * correct direction to be wrong in.
    */
   has(key: string): boolean {
-    if (!this.loaded()) return true;
+    if (!this.loaded() || this.errored()) return true;
     return this.rows()[key] === 'true';
   }
 
