@@ -245,6 +245,23 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
         });
         const cartesianResponse = this._httpResponseService.getCartesianResponse(cloneResponse);
         if (cartesianResponse) {
+          // ── THE STATUS, STAMPED (UF-D33 option B; `F28`, dated to 9999e16, 2023-10-21).
+          //
+          // This throws the PARSED BODY rather than the `HttpErrorResponse`, so `err.status` and
+          // `err.error` are `undefined` in every component in every app. The sentence is NOT lost —
+          // `handleCartesianResponse()` lifts it out and `showError()` displays it — but with no
+          // status a component cannot tell a 422 REFUSAL from a failure, and so cannot show it IN
+          // PLACE beside the rows being answered. A placement defect, not a silent one.
+          //
+          // `__status`, NOT `status`: `__cartesian` and `__redirectUrl` already namespace this way,
+          // and a response body may legitimately carry a `status` field of its own.
+          //
+          // PURELY ADDITIVE. The 6 call sites in `care`, `pos`, `system` and `platform/common` that
+          // read the flat shape are untouched, because nothing is taken away. Rethrowing the real
+          // `HttpErrorResponse` would repair 56 dead reads and break those 6 — a platform migration
+          // wearing a one-line fix's clothing, and the user's call, not this workstream's.
+          (cartesianResponse as any).__status = response.status;
+
           this._httpResponseService.handleCartesianResponse(cloneResponse, cartesianResponse);
         } else {
           this._httpResponseService.handleErrorResponse(cloneResponse);
