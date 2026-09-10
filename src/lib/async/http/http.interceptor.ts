@@ -245,21 +245,10 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
         });
         const cartesianResponse = this._httpResponseService.getCartesianResponse(cloneResponse);
         if (cartesianResponse) {
-          // ── THE STATUS, STAMPED (UF-D33 option B; `F28`, dated to 9999e16, 2023-10-21).
-          //
-          // This throws the PARSED BODY rather than the `HttpErrorResponse`, so `err.status` and
-          // `err.error` are `undefined` in every component in every app. The sentence is NOT lost —
-          // `handleCartesianResponse()` lifts it out and `showError()` displays it — but with no
-          // status a component cannot tell a 422 REFUSAL from a failure, and so cannot show it IN
-          // PLACE beside the rows being answered. A placement defect, not a silent one.
-          //
           // `__status`, NOT `status`: `__cartesian` and `__redirectUrl` already namespace this way,
-          // and a response body may legitimately carry a `status` field of its own.
-          //
-          // PURELY ADDITIVE. The 6 call sites in `care`, `pos`, `system` and `platform/common` that
-          // read the flat shape are untouched, because nothing is taken away. Rethrowing the real
-          // `HttpErrorResponse` would repair 56 dead reads and break those 6 — a platform migration
-          // wearing a one-line fix's clothing, and the user's call, not this workstream's.
+          // and a response body may legitimately carry a `status` field of its own. KEPT after
+          // option A landed, so the ~45 components already reading `err?.__status ?? err?.status`
+          // keep working from either side — `err.error.__status` and `err.status` now agree.
           (cartesianResponse as any).__status = response.status;
 
           this._httpResponseService.handleCartesianResponse(cloneResponse, cartesianResponse);
@@ -267,7 +256,38 @@ export class CartesianHttpInterceptor implements HttpInterceptor {
           this._httpResponseService.handleErrorResponse(cloneResponse);
         }
 
-        return throwError(() => cartesianResponse ?? cloneResponse);
+        // ── UF-D33 OPTION A, TAKEN 2026-09-10 (`F28`, dated to 9999e16, 2023-10-21).
+        //
+        // For years this threw the PARSED BODY, so `err.status` and `err.error` were `undefined`
+        // in every component in every app, and code written the standard Angular way was silently
+        // dead. Two live examples, both working only now: `StoreContextService.validateStoreId()`
+        // and `RegisterContextService.validate…()` each guard on `err instanceof HttpErrorResponse
+        // && err.status === 404` to detect a deleted store/register. Neither guard could ever fire,
+        // so `clearActiveStore()` was unreachable and a stale id survived forever as 'unverified'.
+        //
+        // A REAL `HttpErrorResponse` IS THROWN, CARRYING THE PARSED BODY IN `.error`.
+        //
+        // It is CONSTRUCTED here rather than rethrowing the original, because the original's
+        // `.error` may still be an unparsed `Blob` — that is what `extractContent()` above exists
+        // for, and rethrowing would hand every caller a Blob. So: `err.status` is the real status,
+        // `err.error.message` the server's sentence, `err.error.errors` the 422 field map. The
+        // toast is unaffected — `handleCartesianResponse()` above already fired `showError()`.
+        //
+        // THE FLAT DIALECT WAS NOT DROPPED SILENTLY. Every site reading the body flat was
+        // inventoried and updated in this same change. `error?.error?.message ?? error?.message`
+        // reads correctly under both. DO NOT REINTRODUCE A FLAT-FIRST READ: `HttpErrorResponse`
+        // carries Angular's own generic `.message` ("Http failure response for /v1/…: 422
+        // Unprocessable Entity"), which would win and hide the server's sentence.
+        return throwError(
+          () =>
+            new HttpErrorResponse({
+              error: cartesianResponse ?? errorBody,
+              headers: response.headers,
+              status: response.status,
+              statusText: response.statusText,
+              url: response.url ?? undefined
+            })
+        );
       })
     );
   }
